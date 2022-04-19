@@ -1,5 +1,3 @@
-#from curses.ascii import US
-#from django import forms
 from curses.ascii import SI
 from tkinter import Widget
 from django import forms
@@ -20,26 +18,8 @@ class SignUpForm(ModelForm):
         self.fields['email'].widget.attrs['class'] = 'form-control'
         self.fields['password'].widget.attrs['class'] = 'form-control'
 
+
 '''class LoginForm(forms.Form):
-    class meta:
-        model = User
-        fields = ("username", "password")'''
-
-class NewUserForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-
-    class Meta:
-        model = User
-        fields = ("username", "email", "password1", "password2")
-
-    def save(self, commit=True):
-        user = super(NewUserForm, self).save(commit=False)
-        user.email = self.cleaned_data["email"]
-        if commit:
-            user.save()
-        return user
-
-class LoginForm(forms.Form):
     username = forms.ChoiceField(
         widget=forms.TextInput(
                 attrs = {
@@ -56,7 +36,7 @@ class LoginForm(forms.Form):
         )
     )
 
-'''class SignUpForm(UserCreationForm):
+class SignUpForm(UserCreationForm):
     username = forms.ChoiceField(
         widget=forms.TextInput(
                 attrs = {

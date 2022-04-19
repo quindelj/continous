@@ -88,6 +88,7 @@ class User(AbstractUser):
     USERNAME_FIELD = 'username'
 
     #objects = UserManager()
+    
 
 class Teacher(models.Model):
     #course = models.OneToOneField(Course, related_name = 'course', on_delete = models.CASCADE)
@@ -102,6 +103,9 @@ class Course(models.Model):
     #student = models.ManyToManyField(User, related_name= "student", on_delete = models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
 
 class Parent(models.Model):
     student = models.ForeignKey(User, related_name= 'child', on_delete = models.CASCADE, null = True)
@@ -137,6 +141,9 @@ class Behavior(models.Model):
     reply = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.report
 
 
 
