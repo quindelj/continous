@@ -1,16 +1,18 @@
-from cmath import log
-from curses.ascii import US
-from email import message
-from urllib import request
+from pyexpat import model
+from re import template
+from turtle import title
 from django.shortcuts import render, redirect
 from .models import *
 from django.contrib import messages
-from .forms import SignUpForm
-from django.contrib.auth import authenticate, login, logout
+from .forms import CreateCourseForm,TeacherForm, SignUpForm
+from django.contrib.auth import authenticate, login, logout,get_user_model
+from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 # Create your views here.
+User = get_user_model
+
 def index(request):
     return render (request, 'index.html')
 
@@ -38,7 +40,7 @@ def register_user(request):
             messages.error(request,'An error occured please try again')
     else:
         form = SignUpForm()'''
-    return render(request, 'authenticate/register.html', {'form' : form})
+    return render(request, 'authenticate/teacher_reg.html', {'form' : form})
 
 def login_user(request):
     if request.method == "POST":
@@ -47,7 +49,7 @@ def login_user(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            request.session['user_id'] = user.id
+            #request.session['user_id'] = user.id
             print(username + password)
 
             messages.info(request, f"You are now logged in as {username}.")
@@ -125,14 +127,25 @@ def parent(request):
     return render (request, 'parentHome.html')
 
 #teacher options
-def create_course(resuest):
-    Course.objects.create(
-        title = request.POST['title'],
-        descrption = request.POST['description'],
-        teacher  = User.objects.get(id = request.session['user_id'])
-    )
+def create_course(request):
+    submitted = False
+    teacher = Teacher.objects.all()
+    print (teacher)
+    if request.method == 'POST':
+        form = CreateCourseForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/create_course?submitted=True')
+    else:
+        form = CreateCourseForm()
+        if 'submitted' in request.GET:
+            submitted = True
+    return render(request, 'create_course.html', {'form' : form, 'submitted': submitted, 'teacher': teacher})  
+
+def view_course(request):
+    Course.objects.filter(id = request.session['user_id'])
     messages.info(request, "Course created")
-    return redirect('/teacher')   
+    return render('/teacher')   
 
 def take_attdance(request):
 

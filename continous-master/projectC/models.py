@@ -3,7 +3,6 @@ from django.contrib.auth.models import AbstractUser
 from django.forms import CharField, DateField, ModelChoiceField
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-#import bcrypt
 import re
 import re
 
@@ -42,11 +41,7 @@ class UserManager(models.Manager):
 
     def register(self, form):
         #pw = bcrypt.hashpw(form['password'].encode(), bcrypt.gensalt()).decode()
-        class Types(models.TextChoices):
-            TEACHER = "TEACHER", "Teacher"
-            STUDENT = "STUDENT", "Student"
-            PARENT = "PARENT", "Parent"
-        type = models.CharField(_('Type'), max_length='250', choices = Types.choices, default = Types.STUDENT)
+ 
         return self.create(
             first_name = form['first_name'],
             last_name = form['last_name'],
@@ -72,6 +67,29 @@ class ParentManager(models.Manager):
         return super().get_queryset(*args, **kwargs).filter(type = User.Types.PARENT)
 # Create your models here.
 class User(AbstractUser):
+
+    ''' TEACHER = 'TEACHER'
+    STUDENT = 'STUDENT'
+    PARENT = 'PARENT'
+    
+    USER_TYPE = [
+        (TEACHER, 'Teacher'),
+        (STUDENT, 'Student'),
+        (PARENT, 'Parent'),
+    ] '''
+    class Types(models.TextChoices):
+        TEACHER = "TEACHER", "Teacher"
+        STUDENT = "STUDENT", "Student"
+        PARENT = "PARENT", "Parent"
+#user type
+    #type = models.CharField(max_length=250, choices = USER_TYPE.choices, default = STUDENT,)
+
+    ''' def is_upperclass(self):
+        return self.type in{
+            self.TEACHER,
+            self.STUDENT,
+        } '''
+
     isTeacher = models.BooleanField('Teacher', default=False)
     isStudent = models.BooleanField('Student', default=False)
     isParent = models.BooleanField('Parent', default=False)
@@ -79,44 +97,71 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=225, null=True)
     last_name = models.CharField(max_length=225, null=True)
     username = models.CharField(unique = True, max_length=225, null=True)
+    type = models.CharField(_('Type'), max_length=250, choices = Types.choices, default = Types.STUDENT)
     email = models.EmailField(unique=True)
-    #profilePic = models.ImageField(blank = True, null = True)
-    password = models.CharField(max_length=225)
-    phoneNum = models.CharField(max_length=225, null = True)
+    profilePic = models.ImageField(blank = True, null = True)
+    #password = models.CharField(max_length=225)
+    #password2 = models.CharField(max_length=225, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     USERNAME_FIELD = 'username'
-
-    #objects = UserManager()
     
 
-class Teacher(models.Model):
-    #course = models.OneToOneField(Course, related_name = 'course', on_delete = models.CASCADE)
-    admin = models.OneToOneField(User, related_name='teacher', on_delete= models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    #objects = UserManager()
 
+class Admin(models.Model):
+    admin = models.OneToOneField(User, on_delete=models.CASCADE)
+
+class Teacher(User):
+    object = TeacherManager()
+
+    class Meta:
+        proxy = True
+    #overrides save method
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.type = User.Types.TEACHER
+        return super().save(*args, **kwargs)
+
+    #course = models.ForeignKey(Course, related_name = 'course', on_delete = models.CASCADE, null=True) 
+    #user_type = models.OneToOneField(User, related_name='teacher', on_delete= models.CASCADE,primary_key=True)
+    #created_at = models.DateTimeField(auto_now_add=True)
+    #updated_at = models.DateTimeField(auto_now=True)
+
+class Parent(User):
+    class Meta:
+        proxy = True #doesn't create new table
+    #student = models.ForeignKey(User, related_name= 'child', on_delete = models.CASCADE, null = True)
+    #created_at = models.DateTimeField(auto_now_add=True)
+    #updated_at = models.DateTimeField(auto_now=True)
+
+class Student(User):
+    object = StudentManager()
+
+    class Meta:
+        proxy = True #doesn't create new table
+
+    #overrides save method
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.type = User.Types.STUDENT
+        return super().save(*args, **kwargs)
+    #parent = models.ForeignKey(Parent, related_name='parent', on_delete= models.CASCADE)
+    #user_type = models.OneToOneField(User,related_name='student', on_delete= models.CASCADE, primary_key=True)
+    #course = models.ForeignKey(Course, related_name='student_course', on_delete = models.CASCADE)
+    #created_at = models.DateTimeField(auto_now_add=True)
+    #updated_at = models.DateTimeField(auto_now=True)
 class Course(models.Model):
     title = models.CharField(max_length=225)
     descrption = models.TextField()
     teacher = models.ForeignKey(Teacher, related_name="course_teacher", on_delete = models.CASCADE)
-    #student = models.ManyToManyField(User, related_name= "student", on_delete = models.CASCADE)
+    #student = models.ForeignKey(Student, related_name= "student", on_delete = models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title
 
-class Parent(models.Model):
-    student = models.ForeignKey(User, related_name= 'child', on_delete = models.CASCADE, null = True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-class Student(models.Model):
-    parent = models.ForeignKey(Parent, related_name='parent', on_delete= models.CASCADE)
-    course = models.ForeignKey(Course, related_name='student_course', on_delete = models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 class GradeBook(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
