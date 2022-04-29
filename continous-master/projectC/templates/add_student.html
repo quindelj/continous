@@ -17,7 +17,7 @@
     <body>
         <h1>Hello, {{ user.username|default:'Guest' }}</h1>
 
-        <p> Welcome to the Our site</p>
+        <p> </p>
         <div>
             {% if user.is_authenticated %}
                 <a href="{% url 'logout' %}">Logout</a>
@@ -26,24 +26,20 @@
                 <a href="{% url 'login_user' %}">Login</a>
             {% endif %}
         </div>
+        <a href="/home">Home</a>
         <div class="course_list">
-            {% for course in user.course_teacher.all %}
-                <div class="course_block">
-                    <a href="/view_course/{{course.id}}">{{course.title}} </a>
-                    
-                    {{course.teacher.first_name}}
-                    {{course.id}}
+            {% if submitted %}
+        {% else %}
+        <form action="" method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Add</button>
                 </div>
-            {% endfor %}
-            {% for course in course %}
-                <div class="course_block">
-                    <a href="/view_course/{{course.id}}">{{course.title}} </a>
-                    
-                    {{course.teacher.first_name}}
-                    {{course.id}}
-                </div>
-            {% endfor %}
-            <a href="/create_course">Create Course</a>
+            </div>
+        </form>
+        {% endif %}
+            <a href="/view_course/{{course.id}}">Add Student</a>
         </div>
         <script src="" async defer></script>
     </body>

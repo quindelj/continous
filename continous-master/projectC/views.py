@@ -4,7 +4,7 @@ from turtle import title
 from django.shortcuts import render, redirect
 from .models import *
 from django.contrib import messages
-from .forms import CreateCourseForm,TeacherForm, SignUpForm
+from .forms import CreateCourseForm,TeacherForm, StudentForm, AddStudentForm
 from django.contrib.auth import authenticate, login, logout,get_user_model
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
@@ -16,9 +16,9 @@ User = get_user_model
 def index(request):
     return render (request, 'index.html')
 
-def register_user(request):
+def register_teacher(request):
     if request.method == 'POST':
-        form = SignUpForm(request.POST)
+        form = TeacherForm(request.POST)
         if form.is_valid():
             form.save()
             username = form.cleaned_data['username']
@@ -28,19 +28,24 @@ def register_user(request):
             messages.success(request,'You have successfully registured!')
             return redirect('/home')
     else:
-        form = SignUpForm()
-    '''if request.method == 'POST':
-        form = SignUpForm(request.POST)
+        form = TeacherForm()
+    return render(request, 'authenticate/teacher_reg.html', {'form' : form})
+
+def register_student(request):
+    if request.method == 'POST':
+        form = StudentForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
+            form.save()
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(username=username, password=password)
+            login(request,user)
             messages.success(request,'You have successfully registured!')
             return redirect('/home')
-        else:
-            messages.error(request,'An error occured please try again')
     else:
-        form = SignUpForm()'''
-    return render(request, 'authenticate/teacher_reg.html', {'form' : form})
+        form = StudentForm()
+    return render(request, 'authenticate/student_reg.html', {'form' : form})
+
 
 def login_user(request):
     if request.method == "POST":
@@ -49,7 +54,7 @@ def login_user(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            #request.session['user_id'] = user.id
+            request.session['user_id'] = user.id
             print(username + password)
 
             messages.info(request, f"You are now logged in as {username}.")
@@ -58,19 +63,7 @@ def login_user(request):
             messages.error(request,"Invalid username or password.")
             return redirect('login_user')
     else:
-        '''form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                messages.info(request, f"You are now logged in as {username}.")
-                return redirect("/home")
-            else:
-                messages.error(request,"Invalid username or password.")
-        else:
-            messages.error(request,"Invalid username or password.")
+        '''
     form = AuthenticationForm()'''
     return render(request, 'authenticate/login.html', context={})
 
@@ -84,6 +77,9 @@ def logout_user(request):
 #@login_required
 def home(request):
     if request.user.is_authenticated:
+        course = Course.objects.all();
+        #teacher = request.session['user_id'] = User.id
+
         '''if request.user.isTeacher:
             return redirect('teacher')
         elif request.user.isStudent:
@@ -102,7 +98,7 @@ def home(request):
         return redirect('student')
     else:
         user = User.objects.get(id = request.session['user_id'])'''
-    return render (request, 'home.html')
+    return render (request, 'home.html', {'course':course})
 
 #@login_required
 def teacher(request):
@@ -130,7 +126,10 @@ def parent(request):
 def create_course(request):
     submitted = False
     teacher = Teacher.objects.all()
-    print (teacher)
+    students = Student.objects.all()
+    #print (teacher, student)
+    #for student in students:
+
     if request.method == 'POST':
         form = CreateCourseForm(request.POST)
         if form.is_valid():
@@ -140,12 +139,14 @@ def create_course(request):
         form = CreateCourseForm()
         if 'submitted' in request.GET:
             submitted = True
-    return render(request, 'create_course.html', {'form' : form, 'submitted': submitted, 'teacher': teacher})  
+    return render(request, 'create_course.html', {'form' : form, 'submitted': submitted, 'teacher': teacher, 'student':student})  
 
-def view_course(request):
-    Course.objects.filter(id = request.session['user_id'])
-    messages.info(request, "Course created")
-    return render('/teacher')   
+def view_course(request, id):
+    course = Course.objects.get(id=id)
+    teacher = Teacher.objects.filter(course_teacher = course)
+    student = Student.objects.filter(course = course)
+    #print(student)
+    return render(request, 'view_course.html',{'course': course, 'teacher': teacher, 'student':student})   
 
 def take_attdance(request):
 
@@ -160,8 +161,24 @@ def record_grades(request):
     return redirect('/')
 
 def add_student(request):
+    submitted = False
+    #id = Teacher.request.session
+    if request.method == 'POST':
+        form = AddStudentForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect('/add_student?submitted=True')
+    else:
+        form = AddStudentForm()
+        if 'submitted' in request.GET:
+            submitted = True
+    return render(request, 'add_student.html', {'form' : form, 'submitted': submitted,}) 
 
-    return redirect ('/')
+
+    studentList = Student.objects.all()
+    addTo =  Course.objects.get(id)
+    studentList.course.add(addTo)
+    return render (request, 'view_course.html',{'course': addTo})
 
 def drop_student(request):
 

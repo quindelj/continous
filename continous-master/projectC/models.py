@@ -112,22 +112,34 @@ class User(AbstractUser):
 class Admin(models.Model):
     admin = models.OneToOneField(User, on_delete=models.CASCADE)
 
+class Course(models.Model):
+    title = models.CharField(max_length=225)
+    descrption = models.TextField()
+    teacher = models.ForeignKey(User, related_name="course_teacher", on_delete = models.CASCADE)
+    student = models.ManyToManyField(User, related_name= "course_student",  blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
 class Teacher(User):
     object = TeacherManager()
 
-    class Meta:
-        proxy = True
+    #class Meta:
+        #proxy = True
     #overrides save method
     def save(self, *args, **kwargs):
         if not self.pk:
             self.type = User.Types.TEACHER
         return super().save(*args, **kwargs)
 
-    #course = models.ForeignKey(Course, related_name = 'course', on_delete = models.CASCADE, null=True) 
-    #user_type = models.OneToOneField(User, related_name='teacher', on_delete= models.CASCADE,primary_key=True)
+    course = models.ForeignKey(Course, related_name = 'course', on_delete = models.CASCADE, null=True) 
+    admins = models.OneToOneField(User, related_name='teacher_admin', on_delete= models.CASCADE, null=True)
     #created_at = models.DateTimeField(auto_now_add=True)
     #updated_at = models.DateTimeField(auto_now=True)
-
+    def __str__(self):
+        return "%s  %s" % ( self.first_name, self.last_name )
+        #return str(self.first_name) 
 class Parent(User):
     class Meta:
         proxy = True #doesn't create new table
@@ -138,8 +150,8 @@ class Parent(User):
 class Student(User):
     object = StudentManager()
 
-    class Meta:
-        proxy = True #doesn't create new table
+    #class Meta:
+        #proxy = True #doesn't create new table
 
     #overrides save method
     def save(self, *args, **kwargs):
@@ -148,19 +160,12 @@ class Student(User):
         return super().save(*args, **kwargs)
     #parent = models.ForeignKey(Parent, related_name='parent', on_delete= models.CASCADE)
     #user_type = models.OneToOneField(User,related_name='student', on_delete= models.CASCADE, primary_key=True)
-    #course = models.ForeignKey(Course, related_name='student_course', on_delete = models.CASCADE)
+    course = models.ForeignKey(Course, related_name='student_course', on_delete = models.CASCADE, null=True)
     #created_at = models.DateTimeField(auto_now_add=True)
     #updated_at = models.DateTimeField(auto_now=True)
-class Course(models.Model):
-    title = models.CharField(max_length=225)
-    descrption = models.TextField()
-    teacher = models.ForeignKey(Teacher, related_name="course_teacher", on_delete = models.CASCADE)
-    #student = models.ForeignKey(Student, related_name= "student", on_delete = models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
     def __str__(self):
-        return self.title
+        return "%s  %s" % ( self.first_name, self.last_name )
+        #return str(self.first_name + self.last_name)
 
 
 class GradeBook(models.Model):
