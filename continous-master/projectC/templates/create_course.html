@@ -15,6 +15,17 @@
     <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
     </head>
     <body>
+        <div class'wrapper'>
+            {% if messages %}
+            <ul class="messages">    
+                {% for message in messages %}    
+                    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        
+        
         <h1>Hello, {{ user.username|default:'Guest' }}</h1>
 
         <p> Add Course</p>
@@ -28,38 +39,16 @@
         </div>
         {% if submitted %}
         {% else %}
-        <form action="" method="POST">
+        <form action="" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form.as_p }}
-            {% comment %} {% for field in form %}
-            <div class="fieldWrapper">
-                {{ field.errors }}
-                {{ field.label_tag }} {{ field }}
-            </div>
-            {% endfor %} {% endcomment %}
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary">Create Course</button>
-                </div>
+            {{ form.as_ul }}
+            
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Create Course</button>
             </div>
         </form>
         {% endif %}
         <a href="/home">Home</a>
-        <div class="course_list">
-            {% comment %} <form action="" method="POST">
-                {% csrf_token %}
-                {{ form.as_p }}
-                {% for field in form %}
-                <div class="fieldWrapper">
-                    {{ field.errors }}
-                    {{ field.label_tag }} {{ field }}
-                </div>
-                {% endfor %} 
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Create Course</button>
-                    </div>
-                </div>
-            </form> {% endcomment %}
-        </div>
         <script src="" async defer></script>
     </body>
 </html>

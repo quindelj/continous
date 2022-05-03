@@ -15,6 +15,13 @@
     <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
     </head>
     <body>
+        {% if messages %}
+        <ul class="messages">    
+            {% for message in messages %}    
+                <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
+            {% endfor %}
+        </ul>
+        {% endif %}
         <h1>Hello, {{ user.username|default:'Guest' }}</h1>
 
         <p> Welcome to the Our site</p>
@@ -32,15 +39,16 @@
                     <a href="/view_course/{{course.id}}">{{course.title}} </a>
                     
                     {{course.teacher.first_name}}
-                    {{course.id}}
+                    {{course.teacher.id}}
                 </div>
             {% endfor %}
             {% for course in course %}
                 <div class="course_block">
                     <a href="/view_course/{{course.id}}">{{course.title}} </a>
-                    
+                    {{course.teacher.id}}
                     {{course.teacher.first_name}}
                     {{course.id}}
+                    {{course.student.first_name}}
                 </div>
             {% endfor %}
             <a href="/create_course">Create Course</a>

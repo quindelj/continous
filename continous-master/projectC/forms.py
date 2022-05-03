@@ -1,30 +1,19 @@
-from dataclasses import fields
-from pyexpat import model
-from tkinter import Widget
 from django import forms
 from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm
 from .models  import Course, User, Teacher, Student
 
-class TeacherForm(ModelForm):
+class TeacherForm(UserCreationForm):
     class Meta:
         model = Teacher
-        fields = ('username', 'first_name', 'last_name','type', 'email', 'password',)
-        #fields=('__all__')
+        fields = ('username', 'first_name', 'last_name','type', 'email', 'password1','password2')
         def save(self):
             user = super().save(commit=False)
-            user.isTeacher = True
+            user.type = 'TEACHER'
             user.save()
             teacher = Teacher.objects.create(user=user)
             teacher.user_type.add()
             return user
-
-        def clean(self):
-        # Runs the super methods clean data to validate the form (ensure required fields are filled out and not beyond max lens)
-            cleaned_data = super(TeacherForm, self).clean()
-            # verify passwords match
-            password = cleaned_data['password']
-            return cleaned_data # return that cleaned data
 
 
     def __init__(self, *args, **kwargs ):
@@ -33,29 +22,20 @@ class TeacherForm(ModelForm):
         self.fields['first_name'].widget.attrs['class'] = 'form-control'
         self.fields['last_name'].widget.attrs['class'] = 'form-control'
         self.fields['email'].widget.attrs['class'] = 'form-control'
-        self.fields['password'].widget.attrs['class'] = 'form-control'
-        #self.fields['password2'].widget.attrs['class'] = 'form-control'
+        self.fields['password1'].widget.attrs['class'] = 'form-control'
+        self.fields['password2'].widget.attrs['class'] = 'form-control'
 
-class StudentForm(ModelForm):
+class StudentForm(UserCreationForm):
     class Meta:
         model = Student
-        fields = ('username', 'first_name', 'last_name','type', 'email', 'password',)
-        #fields=('__all__')
+        fields = ('username', 'first_name', 'last_name','type', 'email', 'password1','password2')
         def save(self):
             user = super().save(commit=False)
-            user.isStudent = True
+            user.type = 'STUDENT'
             user.save()
             student = Student.objects.create(user=user)
             student.user_type.add()
             return user
-
-        def clean(self):
-        # Runs the super methods clean data to validate the form (ensure required fields are filled out and not beyond max lens)
-            cleaned_data = super(StudentForm, self).clean()
-            # verify passwords match
-            password = cleaned_data['password']
-            return cleaned_data # return that cleaned data
-
 
     def __init__(self, *args, **kwargs ):
         super(StudentForm, self).__init__(*args, **kwargs)
@@ -63,8 +43,8 @@ class StudentForm(ModelForm):
         self.fields['first_name'].widget.attrs['class'] = 'form-control'
         self.fields['last_name'].widget.attrs['class'] = 'form-control'
         self.fields['email'].widget.attrs['class'] = 'form-control'
-        self.fields['password'].widget.attrs['class'] = 'form-control'
-        #self.fields['password2'].widget.attrs['class'] = 'form-control'
+        self.fields['password1'].widget.attrs['class'] = 'form-control'
+        self.fields['password2'].widget.attrs['class'] = 'form-control'
 
 '''class (ModelForm):
     class meta:
@@ -97,21 +77,21 @@ class StudentForm(ModelForm):
     
 
 
-class CreateCourseForm(ModelForm):
+class CreateCourseForm(forms.ModelForm):
     #teacherList = Teacher.objects.all()
     teacher = forms.ModelChoiceField(queryset=Teacher.objects.all())
-    student = forms.ModelMultipleChoiceField(queryset=Student.objects.all())
+    student = forms.ModelMultipleChoiceField(widget= forms.CheckboxSelectMultiple, queryset=Student.objects.all())
     class Meta:
         model = Course
-        fields = ('title', 'descrption','teacher', 'student')
+        fields = ('title', 'descrption','teacher', 'student', 'courseImage')
     lables = {
 
     }
     widgets = {
-        'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder':'Course Title'}),
-        'descrption': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'About Course'}),
+        'title': forms.TextInput(attrs={'class': 'form-control'}),
+        'descrption': forms.TextInput(attrs={'class': 'form-control'}),
         'teacher': forms.Select(attrs={'class': 'form-control', 'placeholder': 'teacher'}),
-        'student': forms.RadioSelect(attrs={'class': 'form-control', 'placeholder':'Course Title'}),
+        'student': forms.CheckboxSelectMultiple(attrs={'class': 'form-control'}),
 
     }
 

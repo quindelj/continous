@@ -15,10 +15,17 @@
     <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
     </head>
     <body>
+        {% if messages %}
+        <ul class="messages">    
+            {% for message in messages %}    
+                <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
+            {% endfor %}
+        </ul>
+        {% endif %}
         <h1>Hello, {{ user.username|default:'Guest' }}</h1>
 
         <p> {{course.title}} </p>
-        <p> {{course.student.first_name}} </p>
+        <p> {{course.teacher_course.first_name}} </p>
         <div>
             {% if user.is_authenticated %}
                 <a href="{% url 'logout' %}">Logout</a>
@@ -29,6 +36,7 @@
         </div>
         <a href="/home">Home</a>
         <div class="course_list">
+
             {% for student in student.course %}
                 <div class="course_block">
                     <a href="/view_course/{{course.id}}">{{course.title}} </a>
@@ -37,7 +45,7 @@
                     {{student.id}}
                 </div>
             {% endfor %}
-            <a href="/add_student">Add Student</a>
+            <a href="/add_student/{{course.id}}">Add Student</a>
         </div>
         <script src="" async defer></script>
     </body>
