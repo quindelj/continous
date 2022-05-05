@@ -28,11 +28,11 @@ class User(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     USERNAME_FIELD = 'username'
-class SiteUser(models.Model):
-    users = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+class SiteUser(User):
+    users = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, parent_link=True)
 
 class Course(models.Model):
-    title = models.CharField(max_length=225)
+    title = models.CharField(max_length=225, null=False)
     courseImage = models.ImageField(null=True, blank=True, upload_to='images/')
     descrption = models.CharField(max_length=225)
     teacher = models.ForeignKey(SiteUser, related_name="course_teacher", on_delete = models.CASCADE)
@@ -41,8 +41,8 @@ class Course(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.title
-class Teacher(User):
+        return str(self.title)
+class Teacher(SiteUser):
     object = TeacherManager()
 
     def save(self, *args, **kwargs):
@@ -62,7 +62,7 @@ class Parent(User):
     #created_at = models.DateTimeField(auto_now_add=True)
     #updated_at = models.DateTimeField(auto_now=True)
 
-class Student(User):
+class Student(SiteUser):
     object = StudentManager()
 
     user = models.OneToOneField(SiteUser, related_name='student_user', on_delete=models.CASCADE,null=True)
@@ -74,7 +74,7 @@ class Student(User):
         return super().save(*args, **kwargs)
 
     def __str__(self):
-        return "%s  %s" % ( self.first_name, self.last_name)
+        return str(f'{self.first_name} {self.last_name}')
         
 
 

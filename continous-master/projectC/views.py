@@ -18,11 +18,14 @@ def register(request):
 
 def register_teacher(request):
     if request.method == 'POST':
+        # form used to create input fileds in html template
         form = TeacherForm(request.POST)
         if form.is_valid():
+            # takes valid form data and creates a new Teacher
             form.save()
             username = form.cleaned_data['username']
             password = form.cleaned_data['password1']
+            # authenticate the user password and username is correct and logs the user in
             user = authenticate(username=username, password=password)
             login(request,user)
             messages.success(request,'You have successfully registured!')
@@ -33,11 +36,14 @@ def register_teacher(request):
 
 def register_student(request):
     if request.method == 'POST':
+        # form used to create input fileds in html template
         form = StudentForm(request.POST)
         if form.is_valid():
+            # takes valid form data and creates a new Teacher
             form.save()
             username = form.cleaned_data['username']
             password = form.cleaned_data['password1']
+            # authenticate the user password and username is correct and logs the user in
             user = authenticate(username=username, password=password)
             login(request,user)
             request.session['user_id'] = user.id
@@ -50,6 +56,7 @@ def register_student(request):
 
 def login_user(request):
     if request.method == "POST":
+        # takes user POST data and authenatcte it to login user
         username = request.POST ['username']
         password = request.POST ['password']
         user = authenticate(request, username=username, password=password)
@@ -59,6 +66,7 @@ def login_user(request):
             messages.info(request, f"You are now logged in as {username}.")
             return redirect("home")
         else:
+            # If authenicatation fail retuns error message
             messages.error(request,"Invalid username or password.")
             return redirect('login_user')
     else:
@@ -71,23 +79,16 @@ def logout_user(request):
     logout(request)
     messages.info(request, "You have successfully logged out.") 
     request.session.clear()
-    return redirect('/login')
+    return redirect('/')
 
-#@login_required
+@login_required
 def home(request):
     if request.user.is_authenticated:
+        user = request.user
         course = Course.objects.all();
         #teacher = request.session['user_id'] = User.id
 
-        '''if request.user.isTeacher:
-            return redirect('teacher')
-        elif request.user.isStudent:
-            return redirect('student')
-        else:
-            return redirect('parent')
-        
-
-    if 'user_id' not in request.session:
+    '''if 'user_id' not in request.session:
         return redirect('/login_user')
     if User.isTeacher == True:
         return redirect('/teacher')
@@ -99,14 +100,12 @@ def home(request):
         user = User.objects.get(id = request.session['user_id'])'''
     return render (request, 'home.html', {'course':course})
 
-#@login_required
+@login_required
 def teacher(request):
-    if 'user_id' not in request.session:
-        return redirect('/login_user')
     user = User.objects.get(id = request.session['user_id'])
     return render (request, 'TeacherHome.html')
 
-#@login_required
+@login_required
 def student(request):
     if 'user_id' not in request.session:
         return redirect('/login_user')
@@ -122,57 +121,43 @@ def parent(request):
     return render (request, 'parentHome.html')
 
 #teacher options
+@login_required
 def create_course(request):
     submitted = False
+    # Course form used to create input fileds in html template
     form =CreateCourseForm(request.POST or None)
     context = {
         'form':form
     }
     if request.method == 'POST':
         if form.is_valid():
-            title = form.cleaned_data.get('name')
+            # assigns variables to the post data
+            title = form.cleaned_data.get('title')
             descrption = form.cleaned_data.get('descrption')
             teacher = form.cleaned_data.get('teacher')
-            student = form.cleaned_data.get('student')
+            students = form.cleaned_data.get('student')
             try:
+                # attemps to create a new Course based on variables above
                 course = Course()
                 course.title = title
                 course.descrption = descrption
                 course.teacher = teacher
-                course.student =student
+                course.save()
+                # loops through the Students and retun select students
+                course.student.set(students)
+                # saves the course
                 course.save()
                 messages.success(request, 'Course created')
                 return HttpResponseRedirect('/create_course?submitted=True')
             except Exception as e:
-                messages.error(request, 'Error' + str(e))
+                #returns exception error
+                messages.error(request, str(e))
         else:
             messages.error(request, 'Error try again')
             '''form = CreateCourseForm()
             if 'submitted' in request.GET:
                 submitted = True'''
     return render(request, 'create_course.html', context)
-
-
-    '''submitted = False
-    teacher = Teacher.objects.all()
-    student = Student.objects.all()
-    #print (teacher, student)
-    #for student in students:
-
-    if request.method == 'POST':
-        form = CreateCourseForm(request.POST)
-        if form.is_valid():
-            
-            #course = Course.objects.create() 
-            #student.course.add(course) 
-            form.save()
-            student.course.add()
-            return HttpResponseRedirect('/create_course?submitted=True')
-    else:
-        form = CreateCourseForm()
-        if 'submitted' in request.GET:
-            submitted = True
-    return render(request, 'create_course.html', {'form' : form, 'submitted': submitted, 'teacher': teacher, 'student':student})''' 
 
 def view_course(request, id):
     course = Course.objects.get(id=id)
@@ -196,7 +181,8 @@ def record_grades(request):
 
 def add_student(request, course_id):
     submitted = False
-    course_add = Course.objects.filter(id=course_id)
+    teacher_courses = Course.objects.filter(teacher=request.user)
+    course_add = Course.objects.get(id=course_id)
     students = Student.objects.all()
 
     if request.method == 'POST':

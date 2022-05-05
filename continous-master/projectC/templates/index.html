@@ -19,31 +19,32 @@
 <body>
     
     <div class="wrapper">
-        <div class="login-box">
-        {% if messages %}
-        <ul class="messages">
+        <div class="container"
             {% for message in messages %}
-            <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+                <div class="container-fluid p-4">
+                    <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" >
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
             {% endfor %}
-        </ul>
-        {% endif %}
-        <h1>Hello, {{ user.username|default:'Guest' }}</h1>
+            <h1>Hello, {{ user.username|default:'Guest' }}</h1>
 
-        <p> Welcome to the Our site</p>
-        <div>
-            {% if user.is_authenticated %}
-                <a href="{% url 'logout' %}">Logout</a>
+            <p> Welcome to the Our site</p>
+            <div>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}">Logout</a>
+                
+                {% else %}
+                    <a href="/login_user">Login</a>
+                {% endif %}
+            </div>
+                
+                
+                <a href="/register">Register</a>
             
-            {% else %}
-                <a href="/login_user">Login</a>
-            {% endif %}
+            <div>
         </div>
-            
-            
-            <a href="/register">Register</a>
-        
-        <div>
-            
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
         integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous">

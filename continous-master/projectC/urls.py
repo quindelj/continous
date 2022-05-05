@@ -8,7 +8,7 @@ urlpatterns = [
     path('register_student', views.register_student, name='register_student'),
     #path('login_user', views.index, name = 'login_user'),
     path('login_user', views.login_user, name='login_user'),
-    path('logout', views.logout),
+    path('logout_user', views.logout_user, name='logout_user'), 
 
     path('home', views.home, name='home'),
     path('teacher', views.teacher),

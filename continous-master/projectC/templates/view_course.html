@@ -25,7 +25,8 @@
         <h1>Hello, {{ user.username|default:'Guest' }}</h1>
 
         <p> {{course.title}} </p>
-        <p> {{course.teacher_course.first_name}} </p>
+        <p> {{course.teacher.first_name}} </p>
+        <p> {{course.student.first_name}} </p>
         <div>
             {% if user.is_authenticated %}
                 <a href="{% url 'logout' %}">Logout</a>
@@ -37,11 +38,9 @@
         <a href="/home">Home</a>
         <div class="course_list">
 
-            {% for student in student.course %}
-                <div class="course_block">
-                    <a href="/view_course/{{course.id}}">{{course.title}} </a>
-                    
-                    {{student.first_name}}
+            {% for student in course.student.all %}
+                <div class="course_block">                    
+                    {{student.first_name}} {{student.last_name}}
                     {{student.id}}
                 </div>
             {% endfor %}

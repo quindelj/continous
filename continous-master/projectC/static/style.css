@@ -1,0 +1,27 @@
+*{
+    margin: 4px;
+    padding: 4px;
+}
+
+/* Input Forms */
+.form-label{
+    color: #f2f2f2;
+}
+
+.form-control{
+    background-color: #0d1117;
+    color: #f2f2f2;
+    border: none
+}
+.title{
+    color: #f2f2f2;
+}
+.form-control:focus{
+    border: 4px solid #8ba596;
+    background-color: #0d1117;
+    color: #f2f2f2;
+}
+
+.form.control.col-10{
+    height: 40px;
+}

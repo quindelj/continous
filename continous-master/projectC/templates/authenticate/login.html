@@ -19,37 +19,35 @@
 <body>
     
     <div class="wrapper">
-        <div class="login-box">
-        <h1 class='title'>login</h1>
-        {% if messages %}
-        <ul class="messages">
+        <section>
+            <h1 class='title'>login</h1>
             {% for message in messages %}
-            <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-        <div class="login-box">
-            <form action="" method="POST">
-                {% csrf_token %}
-                    <div class="col-12">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" name="username" id="username" class="form-control">
-                    </div>
-                    <div class="col-md-12">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" name="password" id="password" class="form-control">
-                    </div>
-                    <div class="col-12">
-                        <button type="submit" value="submit" class="btn btn-success">Sign in</button>
+                <div class="container-fluid p-4">
+                    <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" >
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 </div>
-            </form>
-            <a href="/register">Register</a>
-            <a href="/home">Home</a>
-        </div> 
-        <div>
-            
+            {% endfor %}
+            <div class="login-box">
+                <form action="" method="POST">
+                    {% csrf_token %}
+                        <div class="col-12">
+                            <input type="text" name="username" id="username" placeholder="Enter Username" class="form-control">
+                        </div>
+                        <div class="col-md-12">
+                            <input type="password" name="password" id="password" placeholder="Enter Password" class="form-control">
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" value="submit" class="btn btn-success">Sign in</button>
+                        </div>
+                </form>
+                <a href="/register">Register</a>
+                <a href="/home">Home</a>
+            </div> 
+        </section>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
         integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous">
     </script>
