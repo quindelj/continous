@@ -1,9 +1,9 @@
+from dataclasses import fields
 from django import forms
-from django.db import models
-from django.forms import ModelForm
+from django.forms import HiddenInput, ModelForm
 from django.contrib.auth.forms import UserCreationForm
-from .models  import Course, User, Teacher, Student
-
+from .models  import Attendance, AttendanceReport, Behavior, Course, User, Teacher, Student
+from django.forms import inlineformset_factory
 class TeacherForm(UserCreationForm):
     # creates a user as a student
     class Meta:
@@ -11,6 +11,7 @@ class TeacherForm(UserCreationForm):
         fields = ('username', 'first_name', 'last_name','type', 'email', 'password1','password2')
         def save(self):
             user = super().save(commit=False)
+            user.isTeacher = True
             user.type = 'TEACHER'
             user.save()
             teacher = Teacher.objects.create(user=user)
@@ -52,6 +53,7 @@ class StudentForm(UserCreationForm):
         fields = ('username', 'first_name', 'last_name','type', 'email', 'password1','password2')
         def save(self):
             user = super().save(commit=False)
+            user.isStudent = True
             user.type = 'STUDENT'
             user.save()
             student = Student.objects.create(user=user)
@@ -119,20 +121,19 @@ class StudentForm(UserCreationForm):
 
 
 class CreateCourseForm(forms.ModelForm):
-    #teacherList = Teacher.objects.all()
     teacher = forms.ModelChoiceField(queryset=Teacher.objects.all()) # gets the teachers form the database
     student = forms.ModelMultipleChoiceField(widget= forms.CheckboxSelectMultiple, queryset=Student.objects.all()) # gets all students from the database and allows you to selcet more than one
     #student = CustomModelChoiceField(widget= forms.CheckboxSelectMultiple, queryset=Student.objects.all()) # gets all students from the database and allows you to selcet more than one
 
     class Meta:
         model = Course
-        fields = ('title', 'descrption','teacher','student', 'courseImage')
+        fields = ('title','teacher','student', 'courseImage')
     lables = {
 
     }
     widgets = {
         'title': forms.TextInput(attrs={'class': 'form-control'}),
-        'descrption': forms.TextInput(attrs={'class': 'form-control'}),
+        #'descrption': forms.TextInput(attrs={'class': 'form-control'}),
         'teacher': forms.Select(attrs={'class': 'form-control', 'placeholder': 'teacher'}),
         'student': forms.CheckboxSelectMultiple(attrs={'class': 'form-control'}),
 
@@ -158,12 +159,33 @@ class AddStudentForm(ModelForm):
         'course': forms.Select(attrs={'class': 'form-control', 'placeholder': 'About Course'}),
     }
 
-'''class StudentAddForm(ModelForm):
+class BehaviorForm(ModelForm):
+    student = forms.ModelChoiceField(queryset=Student.objects.all())
+    teacher = forms.ModelChoiceField(queryset=Teacher.objects.all()) #
     class Meta:
-        model = Course
-        fields = ('course','teacher')
-    
-    widgets = {
-        'course': forms.Select(attrs={'class': 'form-control', 'placeholder':'Course Title'}),
-        'teacher': forms.CheckboxSelectMultiple(attrs={'class': 'form-control', 'placeholder': 'teacher'}),
-    }'''
+        model = Behavior
+        fields = ('student', 'teacher', 'incident_date' ,'location', 'details', 'sign')
+        widgets = {
+            'student': forms.Select(attrs={'class': 'form-control'}),
+            'teacher': forms.Select(attrs={'class': 'form-control'}),
+            'incident_date': forms.DateInput(format=('%Y-%m-%d'), attrs={'class': 'form-control', 'placeholder': 'Select a date','type': 'date'}),
+            'location': forms.TextInput(attrs={'class': 'form-control'}),
+            'details': forms.Textarea(attrs={'class': 'form-control'}),
+            'sign': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+class TakeAttendanceForm(ModelForm):
+    student = forms.ModelChoiceField(queryset=Student.objects.all())
+    #status = forms.ModelMultipleChoiceField(widget= forms.CheckboxSelectMultiple, queryset=Attendance.status)
+    #course = forms.ModelChoiceField(queryset=Course.objects.all())
+    class Meta:
+        model = Attendance
+        widgets = {'student':HiddenInput}
+        fields = ('student', 'status',)
+AttendanceFormset = inlineformset_factory(Student,Attendance,form=TakeAttendanceForm,fields=('student','status'))
+        #attendance_type = [('P', 'Present'), ('T', 'Tardy'), ('A', 'Absent')]
+        #widgets = {
+        #'status': forms.CheckboxSelectMultiple(attrs={'class': 'form-control',}),
+        #'course': forms.Select(attrs={'class': 'form-control'}),
+        #'date': forms.DateTimeInput(attrs={'class': 'form-control'}),
+        #'student': forms.TextInput(attrs={'class': 'form-control'}),
+    #}

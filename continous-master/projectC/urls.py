@@ -13,9 +13,13 @@ urlpatterns = [
     path('home', views.home, name='home'),
     path('teacher', views.teacher),
     path('student', views.student),
-    path('parent', views.parent),
+    #path('parent', views.parent),
 
     path('create_course', views.create_course),
-    path('view_course/<int:id>', views.view_course),
+    path('view_course/<int:course_id>', views.view_course),
     path('add_student/<int:course_id>', views.add_student),
+    path('attendance/<int:course_id>', views.attendance),
+    path('take_attendance/<int:course_id>', views.take_attendance),
+    path('report_behavior', views.report_behavior),
+    path('view_behavior/<str:name>/<int:behavior_id>', views.view_behavior),
 ]

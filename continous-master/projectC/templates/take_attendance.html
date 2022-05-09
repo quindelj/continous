@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Continuous </title>
+    {% load static %}
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous">
+    </script>
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+    </head>
+    <body>
+        {% if messages %}
+        <ul class="messages">    
+            {% for message in messages %}    
+                <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <div class='topnav'>
+            <a herf='/view_course/{{course.id}}'><img src'img/back.png' alt='back' style='width: 30px; margin: 0 15px'></a>
+        </div>
+        
+        <h1> {{course.title}} Attendance </h1>
+        <p> Please complete daily </p>
+
+        <div class='container'>
+            <div class="row">
+                <div class="col-12">
+                    <table class="center">
+                    <col style="width: 30%" />
+                    <col style="width: 80%" />
+                    <col style="width: 50%" />
+                    <col style="width: 50%" />
+                    <col style="width: 50%" />
+                    <col style="width: 60%" />
+
+                    <head>
+                        <tr>
+                        <th scope="col">Student ID</th>
+                        <th scope="col">Student Name</th>
+                        <th scope="col">A</th>
+                        <th scope="col">T</th>
+                        <th scope="col">P</th>
+                        </tr>
+                    </head>
+                    <body>
+                    <form action="/take_attendance" method="POST">
+                        {% csrf_token %}
+                        {% for student in att_data %}
+                                <tr class="">
+                                    <td>{{ student.id }}</td>
+                                    <td>{{ student.first_name }} {{ student.last_name }}</td>
+                                    <td class="text-center">
+                                        <input type="hidden" name="student[]" value="{{ student.id }}">
+                                        <input type="radio" class="btn-check" name="type[{{ student.id}}]" value="1" id="btnradio-{{student.id}}" {% if student.status == 'P' %} checked="checked" {% endif %} autocomplete="off" required>
+                                        <label class="btn btn-outline-primary btn-sm px-1 py-0" for="btnradio-{{student.id}}"><i class="fa fa-check  text-light"></i></label>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="radio" class="btn-check" name="type[{{ student.id}}]" value="1" id="btnradio-{{student.id}}" {% if student.status == 'T' %} checked="checked" {% endif %} autocomplete="off" required>
+                                        <label class="btn btn-outline-primary btn-sm px-1 py-0" for="btnradio-{{student.id}}"><i class="fa fa-check  text-light"></i></label>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="radio" class="btn-check" name="type[{{ student.id}}]" value="1" id="btnradio-{{student.id}}" {% if student.status == 'A' %} checked="checked" {% endif %} autocomplete="off" required>
+                                        <label class="btn btn-outline-primary btn-sm px-1 py-0" for="btnradio-{{student.id}}"><i class="fa fa-check  text-light"></i></label>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                        {% comment %} <tr>
+                            <th scope="row">{{student.id}}</th>
+                            <td>{{student.first_name}} {{student.last_name}}</td>
+                            <td><input type="checkbox" name="A" /></td>
+                            <td><input type="checkbox" name="T" /></td>
+                            <td><input type="checkbox" name="P" /></td>
+                            </tr>
+                        {% endfor %} {% endcomment %}
+                        
+                    </body>
+                    </table>
+                    <div class="text-center">
+                        <button type="submit" >Submit</button>
+                    </div>
+                    </form>
+
+                    <form action="/take_attendance" method="POST">
+                        {% csrf_token %}
+                        
+                        {% comment %} {{ formset.management_form }}
+                                {% for student in course.student.all %}
+                                    {% for form in formset %}
+                                        {{ form.student}} {{ form.student}}  {{ form.attendance }}
+                                    <br><br>
+                                    {% endfor %}
+                                {% endfor %} {% endcomment %}
+                        {% for student in course.student.all %}
+                            {{student.first_name}} {{student.last_name}} {{form}}
+                            {{form.as_p}}
+                        {% endfor %}
+
+                    </form>
+        {% comment %} <h1>Hello, {{ user.first_name|default:'Guest' }}</h1>
+
+        <p> {{course.title}} </p>
+        <p> {{course.teacher.first_name}} </p>
+        <p> {{course.student.first_name}} </p>
+        <div>
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout_user' %}">Logout</a>
+            
+            {% else %}
+                <a href="{% url 'login_user' %}">Login</a>
+            {% endif %}
+        </div>
+        <a href="/home">Home</a>
+        <div class="course_list">
+                {{form}}
+            {% for student in course.student.all %}
+                <div class="course_block">                    
+                    {{student.first_name}} {{student.last_name}}
+                    
+                </div>
+            {% endfor %}
+            <a href="/add_student/{{course.id}}">Add Student</a>
+            <a href="/take_attendance/{{course.id}}">Take Attendance</a>
+            <a href="/recored_grades/{{course.id}}">Record Grades</a>
+        </div> {% endcomment %}
+        <script src="" async defer></script>
+    </body>
+</html>

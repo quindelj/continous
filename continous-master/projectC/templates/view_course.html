@@ -13,38 +13,289 @@
         integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous">
     </script>
     <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+        <style>
+            * {box-sizing: border-box;}
+            
+            body {
+            margin: 0;
+            background-color: #F6F6F6;
+            font-family: Arial, Helvetica, sans-serif;
+            }
+            
+            .topnav {
+            overflow: hidden;
+            background-image: linear-gradient(to right, #FFB38B , #FF0865);
+            }
+            
+            .ham-button {
+            float: left;
+            padding: 5px 10px;
+            cursor: pointer;
+            }
+            
+            .ham {
+            width: 30px;
+            height: 5px;
+            background-color: white;
+            margin: 5px 3px;
+            }
+                
+            .topnav .home {
+            display: inline-block;
+            color: white;
+            text-align: center;
+            padding: 15px 20px;
+            text-decoration: none;
+            font-size: 17px;
+            }
+            
+            .topnav .search-container {
+            float: right;
+            }
+            
+            .topnav input[type=text] {
+            padding: 7px;
+            margin-top: 8px;
+            font-size: 17px;
+            border: none;
+            }
+            
+            .topnav .search-container button {
+            float: right;
+            padding: 7px 10px;
+            margin-top: 8px;
+            margin-right: 16px;
+            background: #ddd;
+            font-size: 17px;
+            border: none;
+            cursor: pointer;
+            }
+            
+            .topnav .search-container button:hover {
+            background: #ccc;
+            }
+            
+            @media screen and (max-width: 600px) {
+            .topnav .search-container {
+                float: none;
+            }
+            
+            .topnav input[type=text], .topnav .search-container button {
+                float: none;
+                display: block;
+                text-align: left;
+                width: 100%;
+                margin: 0;
+                padding: 14px;
+            }
+            .topnav input[type=text] {
+                border: 1px solid #ccc;  
+            }
+            }
+                
+            .welcome-bar {
+            padding: 10px 50px;
+            display: flex;
+            justify-content: space-around;
+            text-align: start;
+            font-size: 20px;
+            }
+            
+            .split {
+            display: flex;
+            }
+            
+            .split .left {
+            width: 70%;
+            position: relative;
+            }
+            
+            .split .right {
+            width: 30%;
+            max-height: 670px;
+            overflow-y: auto;
+            }
+            
+            .button-container {
+            display: grid;
+            gap: 50px;
+            grid-template-columns: auto auto auto;
+            padding: 40px;
+                
+            border: solid 20px;
+            border-radius: 30px;
+            border-color: rgb(255, 179, 139, .4);
+            margin: 25px;	
+            overflow: auto;
+            
+            
+            }
+            
+            .button-container .icons {
+                width: 130px;
+                height: 130px;
+                border-radius: 30px;
+            }
+            
+                figure{
+                    margin: auto;
+                }
+                
+            figcaption {
+                color: white;
+                background: #FF0865;
+                text-align: center;
+                font-size: 15px;
+                line-height: 20px;
+                font-weight: 700;
+                padding: 2px;
+                border-radius: 15px;
+            }
+            
+            a {
+                text-decoration: none;
+                margin: auto;
+            }
+            
+            .button-container .icons:hover {
+                opacity: .7;
+            }
+            
+            table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+            }
+            
+            td, th {
+            border: 4px solid #9150b0;
+            text-align: center;
+            padding: 20px;
+            }
+            
+            tr:nth-child(odd) {
+            background-color: #f4ebf7;
+            }
+            
+            </style>
     </head>
     <body>
-        {% if messages %}
-        <ul class="messages">    
-            {% for message in messages %}    
-                <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
-            {% endfor %}
-        </ul>
-        {% endif %}
-        <h1>Hello, {{ user.username|default:'Guest' }}</h1>
-
-        <p> {{course.title}} </p>
-        <p> {{course.teacher.first_name}} </p>
-        <p> {{course.student.first_name}} </p>
+        <div class="topnav">
+	
+        <div class="ham-button">
+        <div class="ham"></div>
+        <div class="ham"></div>
+        <div class="ham"></div>
+        </div>
+            
         <div>
             {% if user.is_authenticated %}
-                <a href="{% url 'logout' %}">Logout</a>
+                <a href="{% url 'logout_user' %}">Logout</a>
             
             {% else %}
                 <a href="{% url 'login_user' %}">Login</a>
             {% endif %}
         </div>
         <a href="/home">Home</a>
+
+        <div class="home"><strong>{{course.title}}</strong></div>
+            
+        <div class="search-container">
+            <form action="home.php">
+            <input type="text" placeholder="Search.." name="search">
+            <button type="submit"><i class="fa fa-search"></i></button>
+            </form>
+        </div>
+        </div>
+            
+        <div class="split">
+		
+		<div class="left">
+
+			<div class="welcome-bar">		
+				<h2> {{course.title}} : {{course.teacher.first_name}} </h2>
+				<img src={% static "media/img/calendar.png" %} alt="calendar" style="width: 80px">
+				<img src={% static "media/img/email.jpg" %} alt="email" style="width: 80px">			
+			</div>
+
+			<div class="button-container">
+                
+                    <a href="/attendance/{{course.id}}">
+                    <figure>
+                        <img src={% static "media/img/attendance.jpg"%} alt="attendance" class="icons">
+                        <figcaption>Attendance</figcaption>
+                    </figure>
+                    </a>
+
+
+                    <a href="">
+                    <figure>
+                        <img src={% static "media/img/grades.png"%} alt="grades" class="icons">
+                        <figcaption>Grades</figcaption>
+                    </figure>
+                    </a>
+
+                    <a href="">
+                    <figure>
+                        <img src={% static "media/img/seat.jpg"%} alt="seat" class="icons">
+                        <figcaption>Seating Chart</figcaption>
+                    </figure>
+                    </a>
+
+                    <a href="/report_behavior">
+                    <figure>
+                        <img src={% static "media/img/behavior.png"%} alt="behavior" class="icons">
+                        <figcaption>Behavior Form</figcaption>
+                    </figure>
+                    </a>
+
+                    <a href="">
+                    <figure>
+                        <img src={% static "media/img/data.jpg"%} alt="data" class="icons">
+                        <figcaption>Data Collection</figcaption>
+                    </figure>
+                    </a>
+
+                    <a href="">
+                    <figure>
+                        <img src={% static "media/img/emails.jpg"%} alt="emails" class="icons">
+                        <figcaption>E-mail</figcaption>
+                    </figure>
+                    </a>
+                
+                </div>
+
+            </div>
+
+            
+            <div class="right">
+
+            <table>
+                <tr style="background-color: #c69bd8">
+                <th>ID</th>
+                <th>STUDENT</th>
+                </tr>
+                {% for student in course.student.all %}
+                    <tr>
+                        <td>{{student.id}}</td>
+                        <td>{{student.first_name}} {{student.last_name}}</td>
+                    </tr>
+                {% endfor %}
+                </table>
+                    {% comment %} <a href="/report_behavior">Report Behavior</a>
+                    <a href="/drop_student/{{student.id}}">Drop</a> {% endcomment %}
+
+            </div>
+
+        </div>
+        
         <div class="course_list">
 
-            {% for student in course.student.all %}
-                <div class="course_block">                    
-                    {{student.first_name}} {{student.last_name}}
-                    {{student.id}}
-                </div>
+            
+            <h1> Attendance </h1>
+            {% for atten in attendance.all %}
+                {{atten}}
             {% endfor %}
-            <a href="/add_student/{{course.id}}">Add Student</a>
         </div>
         <script src="" async defer></script>
     </body>
