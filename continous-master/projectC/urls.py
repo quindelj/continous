@@ -26,5 +26,6 @@ urlpatterns = [
     path('attendance/<int:course_id>', views.attendance),
     path('take_attendance/<int:course_id>/<str:date>', views.take_attendance, name='attendance-page'),
     path('report_behavior', views.report_behavior),
-    path(r'view_behavior/<str:name>/<int:behavior_id>', views.view_behavior),
+    path('view_behavior/<str:name>/<int:behavior_id>', views.view_behavior),
+    path('data_report/<int:course_id>', views.view_data)
 ]

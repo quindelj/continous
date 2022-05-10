@@ -180,12 +180,12 @@
     <div class="welcome-bar">
         <div class="left">
             <h2>Welcome, {{ user.first_name}}</h2>
-            <img src="img/calendar.png" alt="calendar" style="align-self: center; margin: 0px 60px; width: 80px">
+            <img src={% static "media/img/calendar.png"%} alt="calendar" style="align-self: center; margin: 0px 60px; width: 80px">
 
         </div>
 
         <div class="right">
-            <img src="img/email.jpg" alt="email" style="float: right; margin-right: 280px; width: 80px">
+            <img src={% static "media/img/email.jpg" %} alt="email" style="float: right; margin-right: 280px; width: 80px">
         </div>
     </div>
 
@@ -193,20 +193,21 @@
     <div class="button-container">
         {% if user.course_teacher == None %}
             <p>You currently don't have any courses</p>
-        {%endif%} {% for course in user.course_teacher.all %}
-        <div class="course_block">
-            <a href="/view_course/{{course.id}}">{{course.title}} </a>
-
-            {{course.teacher.first_name}} {{course.teacher.id}}
-        </div>
+        {%endif%} 
+        {% for course in user.course_teacher.all %}
+        {% comment %} <div class="course_block"> {% endcomment %}
+            <a href="/view_course/{{course.id}}"><img src={{"course.courseImage.url"}} alt="{{course.title}} "class="icons"> </a>
         {% endfor %}
-        <a href="/create_course">Create Course</a>
+        <a href="/create_course"><img src={%static "media/img/add.jpg"%} alt="add course" class="icons"></a> 
+
         {% comment %} <a href="class1.html"><img src="img/art.png" alt="art" class="icons"></a>
         <a href="class1.html"><img src="img/history.jpg" alt="history" class="icons"></a>
         <a href="class1.html"><img src="img/math.jpg" alt="math" class="icons"></a>
         <a href="class1.html"><img src="img/music.jpg" alt="music" class="icons"></a>
         <a href="class1.html"><img src="img/science.jpg" alt="science" class="icons"></a>
-        <a href="class1.html"><img src="img/add.jpg" alt="add" class="icons"></a> {% endcomment %}
+        <a href="class1.html"><img src="img/add.jpg" alt="add" class="icons"></a> 
+        {{course.teacher.first_name}} {{course.teacher.id}}
+        {% endcomment %}
     </div>
     <script src="" async defer></script>
     </body>

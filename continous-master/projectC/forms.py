@@ -148,4 +148,7 @@ class AttendanceForm(forms.Form):
         widgets = {
         'status': forms.CheckboxSelectMultiple(attrs={'class': 'form-control', 'placeholder':'Course Title'}),
         }
+AttendanceFormset = inlineformset_factory(Student,Attendance,form=AttendanceForm,fields=('student', 'status')) 
 
+class TakeAttendanceForm(forms.Form):
+    mark_attendance = forms.ChoiceField(widget=forms.RadioSelect, choices=attendance_type)

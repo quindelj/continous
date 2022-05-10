@@ -8,7 +8,7 @@ from django.forms import formset_factory
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import *
 from django.contrib import messages
-from .forms import AttendanceForm, BehaviorForm, CreateCourseForm,TeacherForm, StudentForm, AddStudentForm
+from .forms import AttendanceForm, BehaviorForm, CreateCourseForm,TeacherForm, StudentForm, AddStudentForm, TakeAttendanceForm
 from django.contrib.auth import authenticate, login, logout,get_user_model
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
@@ -20,7 +20,7 @@ import json
 User = get_user_model
 
 def index(request):
-    return render (request, 'index.html')
+    return render (request, 'authenticate/login.html')
 
 def register(request):
     return render(request, 'register.html')
@@ -104,11 +104,9 @@ def home(request):
         user=request.user
         course = Course.objects.all()
         if user.isTeacher:
-            messages.info(request, f"You are now logged in as {user.first_name}.")
             return redirect('/teacher')
         else: 
             user.isStudent
-            messages.info(request, f"You are now logged in as {user.first_name}.")
         return redirect ('/student')
 
     return render (request, 'home.html', {'course':course})
@@ -155,7 +153,7 @@ def create_course(request):
                 # saves the course
                 course.save()
                 messages.success(request, 'Course created')
-                return HttpResponseRedirect('/create_course/course.id')
+                return HttpResponseRedirect('/home')
             except Exception as e:
                 #returns exception error
                 messages.error(request, str(e))
@@ -168,8 +166,6 @@ def create_course(request):
     return render(request, 'create_course.html', context,)
 
 def view_course(request, course_id):
-    #course_id= Course.objects.get(id=course_id)
-    #student_id = Student.objects.get(id=id)
     course_id = get_object_or_404(Course, id = course_id)
     teacher = Teacher.objects.filter(course_teacher = course_id)
     student = Student.objects.filter(course_student = course_id)
@@ -179,55 +175,95 @@ def view_course(request, course_id):
     print(student, teacher,attendance,behavior)
     return render(request, 'view_course.html',{'course': course_id, 'teacher': teacher, 'student':student, 'behavior':behavior})   
 
+def view_data(request, course_id):
+    
+    course_id = get_object_or_404(Course, id = course_id)
+    teacher = Teacher.objects.filter(course_teacher = course_id)
+    students = Student.objects.filter(course_student = course_id)
+    attendance = Attendance.objects.filter(course = course_id)
+    behavior = Behavior.objects.filter(teacher = teacher, student = students)
+
+    context = {
+        'course':course_id,
+        'teacher':teacher,
+        'student':students,
+        'attendance':attendance,
+        'behavior':behavior
+    }
+    return render(request, 'data.html', context)  
+
 def attendance(request, course_id):
+    '''
+    Get the course and student to take attendance
+    AttendaceForm gets the attendance status
+    '''
     course_id = get_object_or_404(Course, id = course_id)
     student = Student.objects.filter(course_student = course_id)
     count = student.count()
-    attendance_formset = formset_factory(AttendanceForm, extra=count)
+    attendance_formset = formset_factory(TakeAttendanceForm, extra=count)
+    #teacher = Teacher.objects.filter(course_teacher = course_id)
     date = datetime.today().date
     #.datetime('%d-%m-%Y')
-    print(student)
+    #print(student)
 
     if request.user.is_authenticated:
-        teacher = request.user
+        #teacher = request.user
         if request.method == 'POST':
             formset = attendance_formset(request.POST)
-            list = zip(student,formset)
+            list = zip(student,formset) #add student and attendance tuple list
             if formset.is_valid():
-                for form, student in zip(formset,student):
-                    date = datetime.today()
-                    mark = form.cleaned_data['status']
-                    print(mark)
-                    check_attendance = Attendance.objects.filter(coures=course_id, date=date, student=student)
-                    print(check_attendance)
-                    if check_attendance:
-                        attendance = Attendance.objects.get(course=course_id,date=date,student=student)
-                        if attendance.status == 'Absent':
-                            student.absent = student.absent - 1
-                        elif attendance.status == 'Present':
-                            student.present = student.present - 1
-                        attendance.status = mark
-                        attendance.save()
-                    else:
-                        attendance = Attendance()
-                        attendance.teacher = teacher
-                        attendance.student = student
-                        attendance.date = date
-                        attendance.status= mark
-                        attendance.save()
-                    if mark == 'Absent':
-                        student.absent = student.absent + 1
-                    if mark == 'Present':
-                        student.present = student.present + 1
-                    student.save()
+                try:
+                    for form, student in zip(formset,student): #for loop to get studens and attendance type
+                        date = datetime.today()
+                        mark = form.cleaned_data['mark_attendance']
+                        print(mark)
+                        check_attendance = Attendance.objects.filter(course=course_id, date=date, student=student) # checks if attendance exist
+                        print(check_attendance)
+                        '''
+                        if attendance exist matcing querset it removes the the values
+                        '''
+                        if check_attendance:
+                            attendance = Attendance.objects.get(course=course_id,date=date,student=student)
+                            if attendance.status == 'A':
+                                student.absent = student.absent - 1
+                            elif attendance.status == 'P':
+                                student.present = student.present - 1
+                            elif attendance.status == 'T':
+                                student.present = student.present - 1
+                            attendance.status = mark
+                            attendance.save()
+                except Exception as e:
+                #returns exception error
+                    messages.error(request, str(e))
+                else:
+                    ''''
+                    If no attendance exist one is created
+                    takes the valuses and submit them
+                    '''
+                    attendance = Attendance()
+                    attendance.course = course_id
+                    #attendance.teacher = teacher
+                    attendance.student = student
+                    attendance.date = date
+                    attendance.status= mark
+                    attendance.save()
+
+                if mark == 'Absent':
+                    student.absent = student.absent + 1
+                if mark == 'Present':
+                    student.present = student.present + 1
+                student.save()
                 context = {
                     'students': student,
                     'course': course_id,
                 }
                 messages.success(request,'Attendance submited')
-                return HttpResponseRedirect('/take_attendance/course.id')
+                return redirect ('/view_course/'+str(course_id.id))
+
+                #return redirect ('/take_attendance/'+ str(course_id.id)+'/'+ str(date))
             else:
                 messages.error(request,'An error occured try again')
+                return redirect ('/attendance/'+ str(course_id.id))
         else:
             list = zip(student,attendance_formset())
             context = {
@@ -238,6 +274,7 @@ def attendance(request, course_id):
                 'list': list,
                 'date':date,
             }
+            print(list)
             return render(request, 'take_attendance.html', context)
 
     else:
@@ -270,7 +307,8 @@ def report_behavior(request):
                 bForm.teacher = teacher
                 bForm.incident_date = incident_date
                 bForm.location = location
-                bForm.details = details                
+                bForm.details = details
+                bForm.sign = sign                
                 bForm.save()
                 messages.success(request, 'Behavior form subbmitted')
                 return redirect('/teacher')

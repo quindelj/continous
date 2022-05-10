@@ -154,9 +154,7 @@ class Attendance(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        student_name = Student.objects.get(name = self.student)
-        course_name = Course.objects.get(name = self.course)
-        return '%s %s' % (student_name.name, course_name.title)
+        return str(self.course)+' '+ str(self.student)
 
 class AttendanceReport(models.Model):
     student = models.ForeignKey(Student, on_delete=models.DO_NOTHING)

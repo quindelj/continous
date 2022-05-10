@@ -57,13 +57,15 @@
             width: 100%;
             }
         
-        
+            .radio {
+                display: inline-flex;
+            }
         </style>
     </head>
     <body>
         
         <div class='topnav'>
-            <a href="{{request.META.HTTP_REFERER}}"><img src={% static "media/img/back.png"%} alt="back" style="width: 30px; margin: 0 15px"></a>
+            <a href="/view_course/{{course.id}}"><img src={% static "media/img/back.png"%} alt="back" style="width: 30px; margin: 0 15px"></a>
         </div>
 {% comment %}             <a herf='/view_course/{{course.id}}'><img src={% static 'media/img/back.png' %} alt='back' style='width: 30px; margin: 0 15px'></a>
 {% endcomment %}        
@@ -75,12 +77,13 @@
             </ul>
         {% endif %}
         <h1> {{course.title}} Attendance </h1>
+        <center><h3>{{ date }}</h3></center>
         <p> Please complete daily </p>
 
         <div class='container'>
             <div class="row">
                 <div class="col-12">
-                    <table class="center">
+                    <table class="table table-bordered table-hover ">
                     <col style="width: 30%" />
                     <col style="width: 80%" />
                     <col style="width: 50%" />
@@ -99,14 +102,19 @@
                     </head>
                     <body>
                     <form action="" method="POST">
+                        {{ formset.management_form }}
                         {% csrf_token %}
-                        {% for student in course.student.all %}
+                        {% for student,form in list %}
                         <tr>
                             <th scope="row">{{student.id}}</th>
                             <td>{{student.first_name}} {{student.last_name}}</td>
-                            <td><input type="checkbox" name="A" /></td>
-                            <td><input type="checkbox" name="T" /></td>
-                            <td><input type="checkbox" name="P" /></td>
+                            <td class="radio">
+                                {% for radio in form %}
+                                    {{ radio }}
+                                {% endfor %}
+                            </td>
+                            {% comment %} <td><input type="checkbox" name="T" /></td>
+                            <td><input type="checkbox" name="P" /></td> {% endcomment %}
                             </tr>
                         {% endfor %}
                         
@@ -115,6 +123,7 @@
                     <div class="text-center">
                         <button type="submit" >Submit</button>
                     </div>
+                    
                     </form>
                     <script>
                             $("input[value=Present]").prop('checked',true);
