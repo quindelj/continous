@@ -15,7 +15,11 @@ DAYS_OF_WEEK = (
     ('Friday', 'Friday'),
     ('Saturday', 'Saturday'),
 )
-attendance_type = [('P', 'Present'), ('T', 'Tardy'), ('A', 'Absent')]
+attendance_type = (
+    ('P', 'Present'), 
+    ('T', 'Tardy'), 
+    ('A', 'Absent')
+)
 
 test_name = (
     ('test 1', 'test 1'),
@@ -145,7 +149,7 @@ class Attendance(models.Model):
     teacher = models.ForeignKey(Teacher, related_name= 'teacher_taking', on_delete=models.DO_NOTHING, blank=True, null=True)
     student = models.ForeignKey(Student, related_name =  'student_attendance', on_delete=models.CASCADE)
     date = models.DateField()
-    status = models.CharField(max_length=8, choices= [('P', 'Present'), ('T', 'Tardy'), ('A', 'Absent')], default='Present')
+    status = models.CharField(max_length=8, choices= attendance_type , default='Present')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

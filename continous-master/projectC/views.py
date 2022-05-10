@@ -1,14 +1,18 @@
 from datetime import datetime
 from multiprocessing import context
+from tabnanny import check
 from urllib import response
+from django.urls import reverse
 from webbrowser import get
+from django.forms import formset_factory
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import *
 from django.contrib import messages
-from .forms import BehaviorForm, CreateCourseForm, TakeAttendanceForm,TeacherForm, StudentForm, AddStudentForm, AttendanceFormset
+from .forms import AttendanceForm, BehaviorForm, CreateCourseForm,TeacherForm, StudentForm, AddStudentForm
 from django.contrib.auth import authenticate, login, logout,get_user_model
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from time import strftime
 from django.views.generic.edit import CreateView
 import json
 
@@ -175,104 +179,75 @@ def view_course(request, course_id):
     print(student, teacher,attendance,behavior)
     return render(request, 'view_course.html',{'course': course_id, 'teacher': teacher, 'student':student, 'behavior':behavior})   
 
-def attendance(request, course_id, date = None):
+def attendance(request, course_id):
     course_id = get_object_or_404(Course, id = course_id)
-    teacher = Teacher.objects.filter(course_teacher = course_id)
-    students = Student.objects.filter(course_student = course_id)
-    #form = TakeAttendanceForm(request.POST or None)
-    #context['course'] = course_id
-    #context['date'] = date
+    student = Student.objects.filter(course_student = course_id)
+    count = student.count()
+    attendance_formset = formset_factory(AttendanceForm, extra=count)
+    date = datetime.today().date
+    #.datetime('%d-%m-%Y')
+    print(student)
 
-    attendance_data = {}
-    for student in students:
-        attendance_data[student.id] = {}
-        attendance_data[student.id]['data'] = student
-        if not date is None:
-            date = datetime.strptime(date,'%Y-%m-%d')
-            year = date.strftime('%Y')
-            month = date.strftime('%m')
-            day = date.strftime('%d')
-            attendance = Attendance.objects.filter(date__year = year, date__month = month, date__day = day, course = course_id).all()
-            for atten in attendance:
-                attendance_data[atten.student.id]['status'] = atten.status
-            context = {
-                'attendance_data' : list(attendance.values()),
-                'students':students
+    if request.user.is_authenticated:
+        teacher = request.user
+        if request.method == 'POST':
+            formset = attendance_formset(request.POST)
+            list = zip(student,formset)
+            if formset.is_valid():
+                for form, student in zip(formset,student):
+                    date = datetime.today()
+                    mark = form.cleaned_data['status']
+                    print(mark)
+                    check_attendance = Attendance.objects.filter(coures=course_id, date=date, student=student)
+                    print(check_attendance)
+                    if check_attendance:
+                        attendance = Attendance.objects.get(course=course_id,date=date,student=student)
+                        if attendance.status == 'Absent':
+                            student.absent = student.absent - 1
+                        elif attendance.status == 'Present':
+                            student.present = student.present - 1
+                        attendance.status = mark
+                        attendance.save()
+                    else:
+                        attendance = Attendance()
+                        attendance.teacher = teacher
+                        attendance.student = student
+                        attendance.date = date
+                        attendance.status= mark
+                        attendance.save()
+                    if mark == 'Absent':
+                        student.absent = student.absent + 1
+                    if mark == 'Present':
+                        student.present = student.present + 1
+                    student.save()
+                context = {
+                    'students': student,
+                    'course': course_id,
                 }
-            
-    return render(request, 'take_attendance.html', context)
+                messages.success(request,'Attendance submited')
+                return HttpResponseRedirect('/take_attendance/course.id')
+            else:
+                messages.error(request,'An error occured try again')
+        else:
+            list = zip(student,attendance_formset())
+            context = {
+                'formset': attendance_formset(),
+                'students': student,
+                'teacher': teacher,
+                'course':course_id,
+                'list': list,
+                'date':date,
+            }
+            return render(request, 'take_attendance.html', context)
+
+    else:
+        return HttpResponse(status=403)
     #{'course': course_id, 'teacher': teacher, 'student':students, 'attendance':attendance }
-''' class Attendancecreate(CreateView):
-    
-    model = Attendance
-    form_class = TakeAttendanceForm
-    success_url = '/attendance/'
 
-    def get_context_data(self,** kwargs):
-        context = super(Attendancecreate, self).get_context_data(**kwargs)
-        course = course.objects.get(id=id)
-        context['formset'] = AttendanceFormset(queryset=Attendance.objects.none(), instance=course.objects.get(id=id), initial=[{'student': student} for student in self.get_initial()['student']])
-        return context
-
-    def get_initial(self):
-        course_id = get_object_or_404(Course, id = course_id)
-        course = course.objects.get(id=course_id)
-        initial = super(Attendancecreate , self).get_initial()
-        initial['student'] = Student.objects.filter(student_course=course)
-        return initial
-
-    def post(self, request, *args, **kwargs,):
-        course = course.objects.get(id=id)
-        formset = AttendanceFormset(request.POST,queryset=Attendance.objects.none(), instance=course.objects.get(id=id), initial=[{'student': student} for student in self.get_initial()['student']])
-        if formset.is_valid():
-            return self.form_valid(formset)
-
-    def form_valid(self,formset):
-        instances = formset.save(commit=False)
-        for instance in instances:
-            instance.course_attendance = get_object_or_404(Course, id=id)
-            instance.save()
-        return HttpResponseRedirect('/dashboard/') '''
 
 def take_attendance(request):
-    response = {'ststus':'failed', 'msg':''}
-    if request.method == 'POST':
-        post = request.POST
-        date = datetime.strptime(post['attendance_date'], '%Y-%m-%d')
-        year = date.strftime('%Y')
-        month = date.strftime('%m')
-        day = date.strftime('%d')
-        _class = Course.objects.get(id=post['course'])
-        Attendance.objects.filter(date__year = year, date__month = month, date__day = day, course = _class).delete()
-        for student in post.getlist('student[]'):
-            status = post['typeclassIns['+student+']']
-            studInstance = Student.objects.get(id = student)
-            att = Attendance(student=studInstance, status = status, course = _class, date=post['date']).save()
-        response['status'] = 'success'
-        messages.success(request,"Attendance has been saved successfully.")
-    return HttpResponse(json.dumps(response),content_type="application/json")
-    ''' course_id = get_object_or_404(Course, id = course_id)
-    teacher = Teacher.objects.filter(course_teacher = course_id)
-    students = Student.objects.filter(course_student = course_id)
-    date = datetime.date.today
-    #form = TakeAttendanceForm(request.POST or None)
-        #course,student,date,statu
-
-    if request.method == 'POST':
-        for stu in students:
-            student = get_object_or_404(Student, id = stu.id)
-            if request.POST.get('status') == 'on':
-                Attendance.status == 'A'
-            elif request.POST.get('field_name', '') == 'on':
-                Attendance.status == 'T'
-            else:
-                Attendance.status == 'P'
-            attendance = Attendance(course_id=course_id.id, student=student, status=Attendance.status, date=date)
-            attendance.save()
-
-    messages.success(request,"Attendance Recored")
-
-    return redirect('/attendance/course_id')'''
+    
+    return redirect('/')
 
 def report_behavior(request):
     form =BehaviorForm(request.POST or None)

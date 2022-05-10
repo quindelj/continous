@@ -1,5 +1,10 @@
 from django.urls import path
 from . import views
+from django.contrib import admin
+from django.urls import path
+from django.contrib.auth import views as auth_views
+from django.views.generic.base import RedirectView
+
 
 urlpatterns = [
     path('', views.index),
@@ -19,7 +24,7 @@ urlpatterns = [
     path('view_course/<int:course_id>', views.view_course),
     path('add_student/<int:course_id>', views.add_student),
     path('attendance/<int:course_id>', views.attendance),
-    path('take_attendance/<int:course_id>', views.take_attendance),
+    path('take_attendance/<int:course_id>/<str:date>', views.take_attendance, name='attendance-page'),
     path('report_behavior', views.report_behavior),
-    path('view_behavior/<str:name>/<int:behavior_id>', views.view_behavior),
+    path(r'view_behavior/<str:name>/<int:behavior_id>', views.view_behavior),
 ]
