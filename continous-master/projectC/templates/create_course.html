@@ -41,18 +41,41 @@
         margin: 5px 3px;
         }
             
+        
         .topnav .home {
-        display: inline-block;
-        color: white;
-        text-align: center;
-        padding: 15px 20px;
-        text-decoration: none;
-        font-size: 17px;
-        }
+            display: inline-block;
+            color: white;
+            text-align: center;
+            padding: 15px 20px;
+            text-decoration: none;
+            font-size: 17px;
+            }
+            
+            .topnav .search-container, .logout{
+                float: right;
+                margin: 5px;
+                padding:10px;
+            }
+            .logout a:link, .home a:link{
+                text-decoration: none;
+                text_size = 17px
+            }
+                
+            .logout a:link, .logout a:visited, .home a:link, .home a:visited{
+                color: #f2f2f2
+            }
+                
+            .logout a:hover{
+                color: #FFB38B;
+            }
 
-        .topnav .search-container {
-        float: right;
-        }
+            .home a:hover{
+                color: #FF0865;
+            }
+                
+            .logout a:active, .home a:active{
+                color: #65CCB8;
+            }
 
         .topnav input[type=text] {
         padding: 7px;
@@ -158,11 +181,13 @@
         <div class="ham"></div>
         </div>
             
-        <div class="home"><strong>HOME</strong></div>
-            
-        <div>
+        <div class="home">
+            <a href="/home"><strong>Home</strong></a>
+        </div>
+
+        <div class="logout">
             {% if user.is_authenticated %}
-            <a href="{% url 'logout' %}">Logout</a>
+            <a href="{% url 'logout_user' %}"><strong>Logout</strong></a>
 
             {% else %}
             <a href="{% url 'login' %}">Login</a>
@@ -199,7 +224,6 @@
             </div>
         </form>
         {% endif %}
-        <a href="/home">Home</a>
         <script src="" async defer></script>
     </body>
 </html>

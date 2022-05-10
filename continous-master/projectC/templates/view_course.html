@@ -49,9 +49,32 @@
             font-size: 17px;
             }
             
-            .topnav .search-container {
-            float: right;
+            .topnav .search-container, .logout{
+                float: right;
+                margin: 5px;
+                padding:10px;
             }
+            .logout a:link, .home a:link{
+                text-decoration: none;
+                text_size = 17px
+            }
+                
+            .logout a:link, .logout a:visited, .home a:link, .home a:visited{
+                color: #f2f2f2
+            }
+                
+            .logout a:hover{
+                color: #FFB38B;
+            }
+
+            .home a:hover{
+                color: #FF0865;
+            }
+                
+            .logout a:active, .home a:active{
+                color: #65CCB8;
+            }
+            
             
             .topnav input[type=text] {
             padding: 7px;
@@ -188,7 +211,7 @@
         <div class="ham"></div>
         </div>
             
-        <div>
+        <div class="logout">
             {% if user.is_authenticated %}
                 <a href="{% url 'logout_user' %}">Logout</a>
             
@@ -196,9 +219,12 @@
                 <a href="{% url 'login_user' %}">Login</a>
             {% endif %}
         </div>
-        <a href="/home">Home</a>
 
-        <div class="home"><strong>{{course.title}}</strong></div>
+        <div class="home">
+            <a href="/home"><strong>Home</strong></a>
+
+            <strong>{{course.title}}</strong>
+        </div>
             
         <div class="search-container">
             <form action="home.php">
@@ -217,10 +243,11 @@
 				<img src={% static "media/img/calendar.png" %} alt="calendar" style="width: 80px">
 				<img src={% static "media/img/email.jpg" %} alt="email" style="width: 80px">			
 			</div>
-
+            {% if user.type == STUDENT  %}
+        
 			<div class="button-container">
                 
-                    <a href="/attendance/{{course.id}}">
+                    <a href="view_attendance">
                     <figure>
                         <img src={% static "media/img/attendance.jpg"%} alt="attendance" class="icons">
                         <figcaption>Attendance</figcaption>
@@ -235,39 +262,67 @@
                     </figure>
                     </a>
 
-                    <a href="">
-                    <figure>
-                        <img src={% static "media/img/seat.jpg"%} alt="seat" class="icons">
-                        <figcaption>Seating Chart</figcaption>
-                    </figure>
-                    </a>
-
-                    <a href="/report_behavior">
+                    <a href="/view_behavior/{{user.id}}">
                     <figure>
                         <img src={% static "media/img/behavior.png"%} alt="behavior" class="icons">
                         <figcaption>Behavior Form</figcaption>
                     </figure>
                     </a>
-
-                    <a href="/data_report/{{course.id}}">
-                    <figure>
-                        <img src={% static "media/img/data.jpg"%} alt="data" class="icons">
-                        <figcaption>Data Collection</figcaption>
-                    </figure>
-                    </a>
-
-                    <a href="">
-                    <figure>
-                        <img src={% static "media/img/emails.jpg"%} alt="emails" class="icons">
-                        <figcaption>E-mail</figcaption>
-                    </figure>
-                    </a>
                 
+                    <p>{{user.student.id}}</p>
                 </div>
 
             </div>
+            {% else %}
 
+            <div class="button-container">
+                
+                <a href="/attendance/{{course.id}}">
+                <figure>
+                    <img src={% static "media/img/attendance.jpg"%} alt="attendance" class="icons">
+                    <figcaption>Attendance</figcaption>
+                </figure>
+                </a>
+
+
+                <a href="">
+                <figure>
+                    <img src={% static "media/img/grades.png"%} alt="grades" class="icons">
+                    <figcaption>Grades</figcaption>
+                </figure>
+                </a>
+
+                <a href="">
+                <figure>
+                    <img src={% static "media/img/seat.jpg"%} alt="seat" class="icons">
+                    <figcaption>Seating Chart</figcaption>
+                </figure>
+                </a>
+
+                <a href="/report_behavior">
+                <figure>
+                    <img src={% static "media/img/behavior.png"%} alt="behavior" class="icons">
+                    <figcaption>Behavior Form</figcaption>
+                </figure>
+                </a>
+
+                <a href="/data_report/{{course.id}}">
+                <figure>
+                    <img src={% static "media/img/data.jpg"%} alt="data" class="icons">
+                    <figcaption>Data Collection</figcaption>
+                </figure>
+                </a>
+
+                <a href="">
+                <figure>
+                    <img src={% static "media/img/emails.jpg"%} alt="emails" class="icons">
+                    <figcaption>E-mail</figcaption>
+                </figure>
+                </a>
             
+            </div>
+
+        </div>
             <div class="right">
 
             <table>
@@ -288,15 +343,7 @@
             </div>
 
         </div>
-        
-        <div class="course_list">
-
-            
-            <h1> Behavior </h1>
-            {% for atten in behavior.all %}
-                {{atten}}
-            {% endfor %}
-        </div>
+        {% endif %}
         <script src="" async defer></script>
     </body>
 </html>

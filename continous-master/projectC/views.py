@@ -3,7 +3,6 @@ from multiprocessing import context
 from tabnanny import check
 from urllib import response
 from django.urls import reverse
-from webbrowser import get
 from django.forms import formset_factory
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import *
@@ -12,7 +11,6 @@ from .forms import AttendanceForm, BehaviorForm, CreateCourseForm,TeacherForm, S
 from django.contrib.auth import authenticate, login, logout,get_user_model
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from time import strftime
 from django.views.generic.edit import CreateView
 import json
 
@@ -69,16 +67,15 @@ def login_user(request):
         username = request.POST ['username']
         password = request.POST ['password']
         user = authenticate(request, username=username, password=password)
+        print(user)
         if user is not None:
             login(request, user)
             if user.type == 'TEACHER':
                 messages.info(request, f"You are now logged in as {user.first_name}.")
                 return redirect('/teacher')
-
             else: 
                 user.type == 'STUDENT'
                 messages.info(request, f"You are now logged in as {user.first_name}.")
-
             return redirect ('/student')
             #messages.info(request, f"You are now logged in as {user.first_name}.")
             #return redirect("home")
@@ -168,12 +165,14 @@ def create_course(request):
 def view_course(request, course_id):
     course_id = get_object_or_404(Course, id = course_id)
     teacher = Teacher.objects.filter(course_teacher = course_id)
-    student = Student.objects.filter(course_student = course_id)
+    students = Student.objects.filter(course_student = course_id)
     attendance = Attendance.objects.filter(course = course_id)
+    user=request.session
+    student = Student.objects.filter(course_student = course_id)
     behavior = Behavior.objects.all()
 
-    print(student, teacher,attendance,behavior)
-    return render(request, 'view_course.html',{'course': course_id, 'teacher': teacher, 'student':student, 'behavior':behavior})   
+    print(student, teacher,attendance,behavior,student)
+    return render(request, 'view_course.html',{'course': course_id, 'teacher': teacher, 'students':students, 'behavior':behavior,'user':user, 'student':student})   
 
 def view_data(request, course_id):
     
@@ -182,7 +181,7 @@ def view_data(request, course_id):
     students = Student.objects.filter(course_student = course_id)
     attendance = Attendance.objects.filter(course = course_id)
     behavior = Behavior.objects.filter(teacher = teacher, student = students)
-
+    print(attendance)
     context = {
         'course':course_id,
         'teacher':teacher,
@@ -320,13 +319,7 @@ def report_behavior(request):
             messages.error(request, 'Error try again')
     return render(request, 'behavior.html', {'form': form})
 
-def view_behavior(request, name, behavior_id):
-    behavior_id = get_object_or_404(Behavior, id = behavior_id)
-    #teacher = Teacher.objects.filter(course_teacher = behavior_id)
-    name = Student.objects.filter(student_behavior = behavior_id)
 
-    print(student, teacher)
-    return render(request, 'view_behavior.html',{'name':name})   
 
 def record_grades(request):
 
@@ -351,23 +344,24 @@ def add_student(request, course_id):
             submitted = True
     return render(request, 'add_student.html', {'form' : form, 'submitted': submitted,}) 
 
-def drop_student(request):
-
-    return redirect('/')
-
 #student options
-def join_course(request):
-
-    return redirect('/')
-
-def drop_course(request):
-
-    return redirect('/')
 
 def view_grades(request):
 
     return redirect('/')
 
-def view_behavior(request):
+def view_behavior(request, student_id):
+    student_id = get_object_or_404(Student, id = student_id)
+    behavior = Behavior.objects.filter(student = student_id)
+    student = student_id.id
+    #teacher = Teacher.objects.filter(course_teacher = behavior_id)
 
-    return redirect('/')
+    return render(request, 'view_behavior.html',{ 'behavior':behavior, 'student_id':student_id, 'student':student})  
+
+def view_attendance(request, student_id):
+    student_id = get_object_or_404(Student, id = student_id)
+    attendance = Attendance.objects.filter(student = student_id)
+    student = student_id.id
+    #teacher = Teacher.objects.filter(course_teacher = behavior_id)
+
+    return render(request, 'view_attendance.html',{ 'attendance':attendance, 'student_id':student_id, 'student':student})  

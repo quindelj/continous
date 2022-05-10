@@ -19,11 +19,11 @@
             * {
             box-sizing: border-box;
             }
-            html, body, section, div {
+        {% comment %}  html, body, section, div {
             height: 100%;
             padding: 0;
             margin: 0 auto;
-            }
+            } {% endcomment %}
 
             body { 
             color: #fff;
@@ -37,7 +37,7 @@
             ul{
                 display: none
             }
-            form {
+            {% comment %} form {
                 width: 50%;
                 position: relative;
                 top: 50%;
@@ -45,23 +45,21 @@
                 padding: 2rem;
                 text-align: center;
                 transform: translate(-50%, -50%);
-                }
-                
+                } {% endcomment %}
+            
+            form{
+                width: 50%;
+                background: #FFFFFF;
+                margin: 0 auto 100px;
+                padding: 45px;
+                box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+            }
             label {
                 float: left;
                 }
 
             section {
             width: 100%;
-            }
-
-            article {
-            position: relative;
-            top: 50%;
-            left: 50%;
-            padding: 1rem;
-            text-align: center;
-            transform: translate(-50%, -50%);
             }
             
             .logo {
@@ -107,22 +105,21 @@
             .left-half {
             background-image: url("img/backgroundclassroom.jpg");
             background-position: center;
-            background-repeat: no-repeat;
+            background-repeat: repeat;
             background-size: cover;
-
-            float: left;
-            width: 60%;
+            {% comment %} float: left; {% endcomment %}
             }
             .right-half {
             background-color: #311455;
-            float: left;
-            width: 40%;
+            {% comment %} float: left; 
+            width: 80%;
+            {% endcomment %}
             }
         </style>
 </head>
 
 <body>
-    <section>
+    
         <div class="left-half">
             <article style='top: 42%'>			
                 <img class="logo" src={% static "media/img/logo.jpg"%} alt="Logo">
@@ -140,19 +137,13 @@
                 <div>
                     {% csrf_token %}
                         {{form.as_p}}
-                    <input name="Submit" type="submit" class="button">
+                    <button name="Submit" type="submit" class="button"> Sign Up </button>
 
-                    <<a href="/login_user">Login</a>
-
-                {% comment %} <tr>
-                    <td colspan="3" align="center" valign="bottom"><?php echo $msg;?></td>
-                </tr>
- {% endcomment %}
+                    <p> Already have an account? </p> <a href="/login_user">Login</a>
                 </div>
             </form>
 
         </div>
-    </section>
     
     <script src="" async defer></script>
 </body>

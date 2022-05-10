@@ -13,9 +13,199 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous">
         </script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <style>
+            <style>
+                * {box-sizing: border-box;}
+                
+                body {
+                margin: 0;
+                background-color: #F6F6F6;
+                font-family: Arial, Helvetica, sans-serif;
+                }
+                
+                .topnav {
+                overflow: hidden;
+                background-image: linear-gradient(to right, #FFB38B , #FF0865);
+                }
+                
+                .ham-button {
+                float: left;
+                padding: 5px 10px;
+                cursor: pointer;
+                }
+                
+                .ham {
+                width: 30px;
+                height: 5px;
+                background-color: white;
+                margin: 5px 3px;
+                }
+                    
+                .topnav .home {
+                display: inline-block;
+                color: white;
+                text-align: center;
+                padding: 15px 20px;
+                text-decoration: none;
+                font-size: 17px;
+                }
+                
+                .topnav .search-container, .logout{
+                    float: right;
+                    margin: 5px;
+                    padding:10px;
+                }
+                .logout a:link, .home a:link{
+                    text-decoration: none;
+                    text_size = 17px
+                }
+                    
+                .logout a:link, .logout a:visited, .home a:link, .home a:visited{
+                    color: #f2f2f2
+                }
+                    
+                .logout a:hover{
+                    color: #FFB38B;
+                }
+    
+                .home a:hover{
+                    color: #FF0865;
+                }
+                    
+                .logout a:active, .home a:active{
+                    color: #65CCB8;
+                }
+                
+                
+                .topnav input[type=text] {
+                padding: 7px;
+                margin-top: 8px;
+                font-size: 17px;
+                border: none;
+                }
+                
+                .topnav .search-container button {
+                float: right;
+                padding: 7px 10px;
+                margin-top: 8px;
+                margin-right: 16px;
+                background: #ddd;
+                font-size: 17px;
+                border: none;
+                cursor: pointer;
+                }
+                
+                .topnav .search-container button:hover {
+                background: #ccc;
+                }
+                
+                @media screen and (max-width: 600px) {
+                .topnav .search-container {
+                    float: none;
+                }
+                
+                .topnav input[type=text], .topnav .search-container button {
+                    float: none;
+                    display: block;
+                    text-align: left;
+                    width: 100%;
+                    margin: 0;
+                    padding: 14px;
+                }
+                .topnav input[type=text] {
+                    border: 1px solid #ccc;  
+                }
+                }
+                    
+                .welcome-bar {
+                padding: 10px 50px;
+                display: flex;
+                justify-content: space-around;
+                text-align: start;
+                font-size: 20px;
+                }
+                
+                .split {
+                display: flex;
+                }
+                
+                .split .left {
+                width: 70%;
+                position: relative;
+                }
+                
+                .split .right {
+                width: 30%;
+                max-height: 670px;
+                overflow-y: auto;
+                }
+                
+                .button-container {
+                display: grid;
+                gap: 50px;
+                grid-template-columns: auto auto auto;
+                padding: 40px;
+                    
+                border: solid 20px;
+                border-radius: 30px;
+                border-color: rgb(255, 179, 139, .4);
+                margin: 25px;	
+                overflow: auto;
+                
+                
+                }
+                
+                .button-container .icons {
+                    width: 130px;
+                    height: 130px;
+                    border-radius: 30px;
+                }
+                
+                    figure{
+                        margin: auto;
+                    }
+                    
+                figcaption {
+                    color: white;
+                    background: #FF0865;
+                    text-align: center;
+                    font-size: 15px;
+                    line-height: 20px;
+                    font-weight: 700;
+                    padding: 2px;
+                    border-radius: 15px;
+                }
+                
+                a {
+                    text-decoration: none;
+                    margin: auto;
+                }
+                
+                .button-container .icons:hover {
+                    opacity: .7;
+                }
+                
+                table {
+                font-family: arial, sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+                }
+                
+                td, th {
+                border: 4px solid #9150b0;
+                text-align: center;
+                padding: 20px;
+                }
+                
+                tr:nth-child(odd) {
+                background-color: #f4ebf7;
+                }
+
+        </style>
     </head>
     <body>
-        {% for message in messages %}
+    {% for message in messages %}
             <div class="container-fluid p-4">
                 <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" >
                     {{ message }}
@@ -23,19 +213,83 @@
                 </div>
             </div>
         {% endfor %}
+    <div class="topnav">
+	
+    <div class="ham-button">
+    <div class="ham"> </div>
+    <div class="ham"></div>
+    <div class="ham"></div>
+    </div>
+        
+    <div class="home"><strong>HOME</strong></div>
+        
+    <div class="logout">
+        {% if user.is_authenticated %}
+        <a href="{% url 'logout_user' %}">Logout</a>
 
-        <h1>student</h1>
-        <h1>Hello, {{ user.username|default:'Guest' }}</h1>
+        {% else %}
+        <a href="{% url 'login' %}">Login</a>
+        {% endif %}
+    </div>
 
-        <p> Welcome to the Our site</p>
-        <div>
-            {% if user.is_authenticated %}
-                <a href="{% url 'logout_user' %}">Logout</a>
-            
-            {% else %}
-                <a href="{% url 'login' %}">Login</a>
-            {% endif %}
+    <div class="search-container">
+        <form action="/action_page.php">
+        <input type="text" placeholder="Search.." name="search">
+        <button type="submit"><i class="fa fa-search"></i></button>
+        </form>
+    </div>
+    </div>
+        
+    <div class="welcome-bar">
+        <div class="left">
+            <h2>Welcome, {{ user.first_name}}</h2>
+            <img src={% static "media/img/calendar.png"%} alt="calendar" style="align-self: center; margin: 0px 60px; width: 80px">
+
         </div>
-        <script src="" async defer></script>
+
+        <div class="right">
+            <img src={% static "media/img/email.jpg" %} alt="email" style="float: right; margin-right: 280px; width: 80px">
+        </div>
+    </div>
+
+
+    <div class="button-container">
+        {% if user.course_student == None %}
+            <center><h2>You currently don't have any courses</h2></center>
+        {%endif%} 
+        <a href="view_attendance/{{user.id}}">
+            <figure>
+                <img src={% static "media/img/attendance.jpg"%} alt="attendance" class="icons">
+                <figcaption>Attendance</figcaption>
+            </figure>
+            </a>
+
+
+            <a href="">
+            <figure>
+                <img src={% static "media/img/grades.png"%} alt="grades" class="icons">
+                <figcaption>Grades</figcaption>
+            </figure>
+            </a>
+
+            <a href="/view_behavior/{{user.id}}">
+            <figure>
+                <img src={% static "media/img/behavior.png"%} alt="behavior" class="icons">
+                <figcaption>Behavior Form</figcaption>
+            </figure>
+            </a>
+
+
+        {% comment %} <a href="class1.html"><img src="img/art.png" alt="art" class="icons"></a>
+        <a href="class1.html"><img src="img/history.jpg" alt="history" class="icons"></a>
+        <a href="class1.html"><img src="img/math.jpg" alt="math" class="icons"></a>
+        <a href="class1.html"><img src="img/music.jpg" alt="music" class="icons"></a>
+        <a href="class1.html"><img src="img/science.jpg" alt="science" class="icons"></a>
+        <a href="class1.html"><img src="img/add.jpg" alt="add" class="icons"></a> 
+        {{course.teacher.first_name}} {{course.teacher.id}}
+        {% endcomment %}
+    </div>
+    <script src="" async defer></script>
     </body>
+
 </html>

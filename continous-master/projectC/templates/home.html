@@ -46,15 +46,7 @@
                     {{course.teacher.id}}
                 </div>
             {% endfor %}
-            {% for course in course %}
-                <div class="course_block">
-                    <a href="/view_course/{{course.id}}">{{course.title}} </a>
-                    {{course.teacher.id}}
-                    {{course.teacher.first_name}}
-                    {{course.id}}
-                    {{course.student.first_name}}
-                </div>
-            {% endfor %}
+            
             <a href="/create_course">Create Course</a>
         </div>
         <script src="" async defer></script>

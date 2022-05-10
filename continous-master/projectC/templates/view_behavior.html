@@ -105,7 +105,7 @@
             .item i {
             left: 94%;
             top: 30px;
-        z-index: 1;
+            z-index: 1;
             }
             
             [type="date"]::-webkit-calendar-picker-indicator {
@@ -206,11 +206,28 @@
             </div>
         {% endfor %}
         <<div class="topnav">
-            <a href="{{request.META.HTTP_REFERER}}"><img src="img/back.png" alt="back" style="width: 30px; margin: 0 15px"></a>
+            <a href="{{request.META.HTTP_REFERER}}"><img src={% static "media/img/back.png"%} alt="back" style="width: 30px; margin: 0 15px"></a>
         </div>
             
-        <div class="testbox"> 
-            
+        <div class="d-flex flex-column testbox"> 
+            {% if user.behavior == None %}
+                <center><h2>You don't have and behavior reports</h2></center>
+                <center><strong> Keep up the good work!!</strong></centr>
+            {%endif%} 
+            {% for behavior in behavior.all%}
+            <div class="d-inline-flex p-2 flex-row"
+                <div class="name">
+                    <h2>{{behavior.student}}</h2>
+                </div>
+                <div>
+                    <p>{{behavior.details}}</p>
+                </div>
+                <div class="date">
+                    {{behavior.incident_date}}
+                </div>
+                <hr/>
+            </div>
+            {% endfor %}
         </div>
         <script src="" async defer></script>
     </body>

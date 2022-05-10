@@ -49,8 +49,30 @@
             font-size: 17px;
             }
             
-            .topnav .search-container {
-            float: right;
+            .topnav .search-container, .logout{
+                float: right;
+                margin: 5px;
+                padding:10px;
+            }
+            .logout a:link, .home a:link{
+                text-decoration: none;
+                text_size = 17px
+            }
+                
+            .logout a:link, .logout a:visited, .home a:link, .home a:visited{
+                color: #f2f2f2
+            }
+                
+            .logout a:hover{
+                color: #FFB38B;
+            }
+
+            .home a:hover{
+                color: #FF0865;
+            }
+                
+            .logout a:active, .home a:active{
+                color: #65CCB8;
             }
             
             .topnav input[type=text] {
@@ -180,32 +202,8 @@
             </style>
     </head>
     <body>
-        <div class="topnav">
-	
-        <div class="ham-button">
-        <div class="ham"></div>
-        <div class="ham"></div>
-        <div class="ham"></div>
-        </div>
-            
-        <div>
-            {% if user.is_authenticated %}
-                <a href="{% url 'logout_user' %}">Logout</a>
-            
-            {% else %}
-                <a href="{% url 'login_user' %}">Login</a>
-            {% endif %}
-        </div>
-        <a href="/home">Home</a>
-
-        <div class="home"><strong>{{course.title}}</strong></div>
-            
-        <div class="search-container">
-            <form action="home.php">
-            <input type="text" placeholder="Search.." name="search">
-            <button type="submit"><i class="fa fa-search"></i></button>
-            </form>
-        </div>
+        <div class='topnav'>
+            <a href="/view_course/{{course.id}}"><img src={% static "media/img/back.png"%} alt="back" style="width: 30px; margin: 0 15px"></a>
         </div>
             
         <div class="split">
@@ -213,9 +211,7 @@
 		<div class="left">
 
 			<div class="welcome-bar">		
-				<h2> {{course.title}} : {{course.teacher.first_name}} </h2>
-				<img src={% static "media/img/calendar.png" %} alt="calendar" style="width: 80px">
-				<img src={% static "media/img/email.jpg" %} alt="email" style="width: 80px">			
+				<h2> {{course.title}} : {{course.teacher.first_name}} </h2>	
 			</div>
 
 			<div class="button-container">

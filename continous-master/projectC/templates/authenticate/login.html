@@ -120,13 +120,13 @@
 
 <body>
     {% for message in messages %}
-                <div class="container-fluid p-4">
-                    <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" >
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                </div>
-            {% endfor %}
+        <div class="container-fluid p-4">
+            <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" >
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    {% endfor %}
     <section>
         <div class="left-half">
             <article style='top: 42%'>			
@@ -141,7 +141,7 @@
         <div class="right-half">	
             
 
-            <form action="" method="POST" name="Login_Form">
+            <form action="/login_user" method="POST">
                 {% csrf_token %}
                 <div>
                     <img src={% static "media/img/avatar.png" %} alt="Avatar" class="avatar">
@@ -149,20 +149,14 @@
 
                 <div>
                     <label for="user_name"><b>Username</b></label>
-                    <input type="text" placeholder="Enter Username" name="username" required>
+                    <input type="text" placeholder="Enter Username" name="username">
 
                     <label for="password"><b>Password</b></label>
-                    <input type="password" placeholder="Enter Password" name="password" required>
+                    <input type="password" placeholder="Enter Password" name="password">
                     
-                    <input name="Submit" type="submit" value="Login" class="button">
+                    <button name="submit" type="submit" class="button"> Login </button>
 
-                    <a href="/register">Register</a>
-
-                {% comment %} <?php if(isset($msg)){?> {% endcomment %}
-                <tr>
-                    <td colspan="3" align="center" valign="bottom"><?php echo $msg;?></td>
-                </tr>
-                {% comment %} <?php } ?> {% endcomment %}
+                    <p> Don't have an account? <p>  <a href="/register">Register</a>
 
                 </div>
             </form>
