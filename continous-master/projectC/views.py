@@ -1,4 +1,5 @@
 from datetime import datetime
+from itertools import count
 from multiprocessing import context
 from tabnanny import check
 from urllib import response
@@ -180,14 +181,16 @@ def view_data(request, course_id):
     teacher = Teacher.objects.filter(course_teacher = course_id)
     students = Student.objects.filter(course_student = course_id)
     attendance = Attendance.objects.filter(course = course_id)
+    grades = GradeBook.objects.filter(course = course_id)
     behavior = Behavior.objects.filter(teacher = teacher, student = students)
-    print(attendance)
+    print(grades)
     context = {
         'course':course_id,
         'teacher':teacher,
         'student':students,
         'attendance':attendance,
-        'behavior':behavior
+        'behavior':behavior,
+        'grades':grades
     }
     return render(request, 'data.html', context)  
 
@@ -200,10 +203,8 @@ def attendance(request, course_id):
     student = Student.objects.filter(course_student = course_id)
     count = student.count()
     attendance_formset = formset_factory(TakeAttendanceForm, extra=count)
-    #teacher = Teacher.objects.filter(course_teacher = course_id)
     date = datetime.today().date
-    #.datetime('%d-%m-%Y')
-    #print(student)
+
 
     if request.user.is_authenticated:
         #teacher = request.user
@@ -218,7 +219,6 @@ def attendance(request, course_id):
                         #print(mark)
                         check_attendance = Attendance.objects.filter(course=course_id, date=date, student=student) # checks if attendance exist
                         #print(check_attendance)
-                        #messages.info(request,  'Attendance recored exist for '+ str(date))
                         '''
                         if attendance exist matcing querset it removes the the values
                         '''
@@ -281,12 +281,7 @@ def attendance(request, course_id):
 
     else:
         return HttpResponse(status=403)
-    #{'course': course_id, 'teacher': teacher, 'student':students, 'attendance':attendance }
 
-
-def take_attendance(request):
-    
-    return redirect('/')
 
 def report_behavior(request):
     form =BehaviorForm(request.POST or None)
@@ -325,15 +320,62 @@ def report_behavior(request):
 
 
 def record_grades(request):
-    
     return redirect('/')
 
-# grade/<str:test>/<str:course>/<int:course_id>
-# student,course,test,grade
-#def grade(request, test, course, course_id):
 def grade(request, course_id):
-    course_id(get_object_or_404(Course, id = course_id))
-    grade = get_object_or_404(GradeBook, id = course_id)
+    course_id = get_object_or_404(Course, id = course_id)
+    students = Student.objects.filter(course_student = course_id)
+    # counts the number students in the qureset
+    count = students.count()
+    # set the number of form field based on number of sutdents
+    grade_formset = formset_factory(GradeForm, extra=count)
+    course = course_id
+
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            formset = grade_formset(request.POST)
+            list = zip(students,formset)
+            if formset.is_valid():
+                try:
+                    for form, students in zip(formset,students):
+                        grade = form.cleaned_data['grade']
+                        test = form.cleaned_data['select_test']
+                        check_exist = GradeBook.objects.filter(course = course_id, students=students, test=test)
+                        if check_exist:
+                            messages.info(request, 'Grade already recored')
+                except Exception as e:
+                    print(e)
+                else:
+                    grades = GradeBook()
+                    grades.student = students
+                    grades.course = course_id
+                    grades.test = test
+                    grades.grade = grade
+                    grades.save()
+                try:
+                    students.save()
+                    context = {
+                        'students':students,
+                        'course': course_id,
+                    }
+                    messages.success(request, 'Grades submitted')
+                    return redirect('/view_course/' + str(course_id.id))
+                except Exception as e:
+                    messages.error(request, 'Please mark all grades')
+                return redirect ('/grade/' + str(course_id.id))
+            else:
+                messages.error(request, 'An error occured, try again')
+        else:
+            list = zip(students, grade_formset())
+
+            context = {
+                'formset': grade_formset,
+                'students': students,
+                'course_id': course_id,
+                'course': course_id,
+                'list': list,
+                #'grade':grade,
+            }
     return render(request, 'grades.html', context)
 
 def add_student(request, course_id):
@@ -357,9 +399,10 @@ def add_student(request, course_id):
 
 #student options
 
-def view_grades(request):
+def view_grades(request, student_id):
     student_id = get_object_or_404(Student, id = student_id)
-    grade = GradeBook.objects.filter(student = student_id)
+    #grade = GradeBook.objects.filter(student = student_id)
+    grade = GradeBook.objects.all()
     student = student_id.id
     #teacher = Teacher.objects.filter(course_teacher = behavior_id)
 

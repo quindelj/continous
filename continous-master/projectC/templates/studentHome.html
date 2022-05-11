@@ -205,14 +205,7 @@
         </style>
     </head>
     <body>
-    {% for message in messages %}
-            <div class="container-fluid p-4">
-                <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" >
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            </div>
-        {% endfor %}
+
     <div class="topnav">
 	
     <div class="ham-button">
@@ -239,7 +232,14 @@
         </form>
     </div>
     </div>
-        
+    {% for message in messages %}
+        <div class="container-fluid p-4">
+            <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" >
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    {% endfor %}
     <div class="welcome-bar">
         <div class="left">
             <h2>Welcome, {{ user.first_name}}</h2>
@@ -265,7 +265,7 @@
             </a>
 
 
-            <a href="">
+            <a href="view_grades/{{user.id}}">
             <figure>
                 <img src={% static "media/img/grades.png"%} alt="grades" class="icons">
                 <figcaption>Grades</figcaption>

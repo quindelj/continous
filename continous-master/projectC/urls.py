@@ -23,7 +23,7 @@ urlpatterns = [
     path('view_course/<int:course_id>', views.view_course),
     path('add_student/<int:course_id>', views.add_student),
     path('attendance/<int:course_id>', views.attendance),
-    path('take_attendance/<int:course_id>/<str:date>', views.take_attendance, name='attendance-page'),
+    #path('take_attendance/<int:course_id>/<str:date>', views.take_attendance, name='attendance-page'),
     path('report_behavior', views.report_behavior),
     #path('grade/<str:test>/<str:course>/<int:course_id>', views.grade),
     path('grade/<int:course_id>', views.grade),
@@ -32,4 +32,5 @@ urlpatterns = [
     #student
     path('view_behavior/<int:student_id>', views.view_behavior),
     path('view_attendance/<int:student_id>', views.view_attendance),
+    path('view_grades/<int:student_id>',views.view_grades),
 ]
