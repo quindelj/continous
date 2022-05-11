@@ -25,7 +25,8 @@ urlpatterns = [
     path('attendance/<int:course_id>', views.attendance),
     path('take_attendance/<int:course_id>/<str:date>', views.take_attendance, name='attendance-page'),
     path('report_behavior', views.report_behavior),
-    
+    #path('grade/<str:test>/<str:course>/<int:course_id>', views.grade),
+    path('grade/<int:course_id>', views.grade),
     path('data_report/<int:course_id>', views.view_data),
 
     #student

@@ -3,13 +3,21 @@ from pyexpat import model
 from django import forms
 from django.forms import HiddenInput, ModelForm
 from django.contrib.auth.forms import UserCreationForm
-from .models  import Attendance, AttendanceReport, Behavior, Course, User, Teacher, Student
+from .models  import Attendance, AttendanceReport, Behavior, Course, GradeBook, User, Teacher, Student
 from django.forms import inlineformset_factory
 
 attendance_type = (
     ('P', 'Present'), 
     ('T', 'Tardy'), 
     ('A', 'Absent')
+)
+
+test_name = (
+    ('test 1', 'test 1'),
+    ('test 2', 'test 2'),
+    ('test 3', 'test 3'),
+    ('test 4', 'test 4'),
+    ('Final Exam', 'Final Exam'),
 )
 class TeacherForm(UserCreationForm):
     # creates a user as a student
@@ -152,3 +160,9 @@ AttendanceFormset = inlineformset_factory(Student,Attendance,form=AttendanceForm
 
 class TakeAttendanceForm(forms.Form):
     mark_attendance = forms.ChoiceField(widget=forms.RadioSelect, choices=attendance_type)
+
+class GradeForm(forms.Form):
+
+    select_test = forms.ChoiceField(widget=forms.Select, choices=test_name)
+
+GradeFormset = inlineformset_factory(Student,GradeBook,form=GradeForm,fields=('student', 'grade')) 

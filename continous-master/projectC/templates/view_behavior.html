@@ -210,23 +210,27 @@
         </div>
             
         <div class="d-flex flex-column testbox"> 
-            {% if user.behavior == None %}
-                <center><h2>You don't have and behavior reports</h2></center>
-                <center><strong> Keep up the good work!!</strong></centr>
+            {% if user.student.behavior == None %}
+                
+            {% else %}
+
             {%endif%} 
             {% for behavior in behavior.all%}
-            <div class="d-inline-flex p-2 flex-row"
-                <div class="name">
-                    <h2>{{behavior.student}}</h2>
+                <div class="d-inline-flex p-2 flex-row"
+                    <div class="name">
+                        <h2>{{behavior.student}}</h2>
+                    </div>
+                    <div>
+                        <p>{{behavior.details}}</p>
+                    </div>
+                    <div class="date">
+                        {{behavior.incident_date}}
+                    </div>
+                    <hr/>
                 </div>
-                <div>
-                    <p>{{behavior.details}}</p>
-                </div>
-                <div class="date">
-                    {{behavior.incident_date}}
-                </div>
-                <hr/>
-            </div>
+            {% empty %}
+                <center><h2>You don't have and behavior reports</h2></center>
+                <center><strong> Keep up the good work!!</strong></centr>
             {% endfor %}
         </div>
         <script src="" async defer></script>

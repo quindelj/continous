@@ -7,7 +7,7 @@ from django.forms import formset_factory
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import *
 from django.contrib import messages
-from .forms import AttendanceForm, BehaviorForm, CreateCourseForm,TeacherForm, StudentForm, AddStudentForm, TakeAttendanceForm
+from .forms import AttendanceForm, BehaviorForm, CreateCourseForm, GradeForm,TeacherForm, StudentForm, AddStudentForm, TakeAttendanceForm
 from django.contrib.auth import authenticate, login, logout,get_user_model
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
@@ -215,9 +215,10 @@ def attendance(request, course_id):
                     for form, student in zip(formset,student): #for loop to get studens and attendance type
                         date = datetime.today()
                         mark = form.cleaned_data['mark_attendance']
-                        print(mark)
+                        #print(mark)
                         check_attendance = Attendance.objects.filter(course=course_id, date=date, student=student) # checks if attendance exist
-                        print(check_attendance)
+                        #print(check_attendance)
+                        #messages.info(request,  'Attendance recored exist for '+ str(date))
                         '''
                         if attendance exist matcing querset it removes the the values
                         '''
@@ -230,10 +231,11 @@ def attendance(request, course_id):
                             elif attendance.status == 'T':
                                 student.present = student.present - 1
                             attendance.status = mark
-                            attendance.save()
+                            attendance.save() 
                 except Exception as e:
                 #returns exception error
-                    messages.error(request, str(e))
+                    print(e)
+                    #messages.error(request, str(e))
                 else:
                     ''''
                     If no attendance exist one is created
@@ -322,8 +324,16 @@ def report_behavior(request):
 
 
 def record_grades(request):
-
+    
     return redirect('/')
+
+# grade/<str:test>/<str:course>/<int:course_id>
+# student,course,test,grade
+#def grade(request, test, course, course_id):
+def grade(request, course_id):
+    course_id(get_object_or_404(Course, id = course_id))
+    grade = get_object_or_404(GradeBook, id = course_id)
+    return render(request, 'grades.html', context)
 
 def add_student(request, course_id):
     submitted = False
@@ -347,8 +357,12 @@ def add_student(request, course_id):
 #student options
 
 def view_grades(request):
+    student_id = get_object_or_404(Student, id = student_id)
+    grade = GradeBook.objects.filter(student = student_id)
+    student = student_id.id
+    #teacher = Teacher.objects.filter(course_teacher = behavior_id)
 
-    return redirect('/')
+    return render(request, 'view_grade.html',{ 'grade':grade, 'student_id':student_id, 'student':student})  
 
 def view_behavior(request, student_id):
     student_id = get_object_or_404(Student, id = student_id)

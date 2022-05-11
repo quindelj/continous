@@ -235,7 +235,14 @@
         </div>
             
         <div class="split">
-		
+            {% for message in messages %}
+            <div class="container-fluid p-4">
+                <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" >
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        {% endfor %}
 		<div class="left">
 
 			<div class="welcome-bar">		
@@ -243,38 +250,7 @@
 				<img src={% static "media/img/calendar.png" %} alt="calendar" style="width: 80px">
 				<img src={% static "media/img/email.jpg" %} alt="email" style="width: 80px">			
 			</div>
-            {% if user.type == STUDENT  %}
-        
-			<div class="button-container">
-                
-                    <a href="view_attendance">
-                    <figure>
-                        <img src={% static "media/img/attendance.jpg"%} alt="attendance" class="icons">
-                        <figcaption>Attendance</figcaption>
-                    </figure>
-                    </a>
-
-
-                    <a href="">
-                    <figure>
-                        <img src={% static "media/img/grades.png"%} alt="grades" class="icons">
-                        <figcaption>Grades</figcaption>
-                    </figure>
-                    </a>
-
-                    <a href="/view_behavior/{{user.id}}">
-                    <figure>
-                        <img src={% static "media/img/behavior.png"%} alt="behavior" class="icons">
-                        <figcaption>Behavior Form</figcaption>
-                    </figure>
-                    </a>
-                
-                    <p>{{user.student.id}}</p>
-                </div>
-
-            </div>
-            {% else %}
-
+            
             <div class="button-container">
                 
                 <a href="/attendance/{{course.id}}">
@@ -285,7 +261,7 @@
                 </a>
 
 
-                <a href="">
+                <a href="/grade/{{course.id}}">
                 <figure>
                     <img src={% static "media/img/grades.png"%} alt="grades" class="icons">
                     <figcaption>Grades</figcaption>
@@ -343,7 +319,6 @@
             </div>
 
         </div>
-        {% endif %}
         <script src="" async defer></script>
     </body>
 </html>

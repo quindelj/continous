@@ -135,8 +135,6 @@ class Student(User):
             return present
         except:
             return 0
-
-
 class GradeBook(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -144,6 +142,7 @@ class GradeBook(models.Model):
     grade = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
 class Attendance(models.Model):
     course = models.ForeignKey(Course,related_name = 'course_attendance', on_delete= models.CASCADE)
     teacher = models.ForeignKey(Teacher, related_name= 'teacher_taking', on_delete=models.DO_NOTHING, blank=True, null=True)

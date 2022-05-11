@@ -212,9 +212,9 @@
         {% if user.course_teacher == None %}
             <p>You currently don't have any courses</p>
         {%endif%} 
+
         {% for course in user.course_teacher.all %}
-        {% comment %} <div class="course_block"> {% endcomment %}
-            <a href="/view_course/{{course.id}}"><img src={{"course.courseImage.url"}} alt="{{course.title}} "class="icons"> </a>
+            <a href="/view_course/{{course.id}}"><img src={{"course.courseImage"}} alt="{{course.title}} "class="icons"> </a>
         {% endfor %}
         <a href="/create_course"><img src={%static "media/img/add.jpg"%} alt="add course" class="icons"></a> 
 
@@ -224,7 +224,6 @@
         <a href="class1.html"><img src="img/music.jpg" alt="music" class="icons"></a>
         <a href="class1.html"><img src="img/science.jpg" alt="science" class="icons"></a>
         <a href="class1.html"><img src="img/add.jpg" alt="add" class="icons"></a> 
-        {{course.teacher.first_name}} {{course.teacher.id}}
         {% endcomment %}
     </div>
     <script src="" async defer></script>

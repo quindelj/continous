@@ -74,8 +74,8 @@
                 }
 
             
-            .button {
-                background-color: #04AA6D;
+            .button{
+                background-color: #65CCB8;
                 color: white;
                 padding: 14px 20px;
                 margin: 8px 0;
@@ -89,6 +89,22 @@
                 opacity: 0.8;
                 }
                 
+                a:link{
+                    text-decoration: none;
+                }
+                    
+                a:link, a:visited{
+                    color: #f2f2f2
+                }
+                    
+                a:hover{
+                    color: #6dccb8;
+                }
+    
+
+                a:active{
+                    color: #65CCB8;
+                }
             
             input[type=text], input[type=password] {
                 width: 100%;
@@ -111,7 +127,7 @@
             width: 60%;
             }
             .right-half {
-            background-color: #311455;
+            background-color: #883fa6;
             float: left;
             width: 40%;
             }
@@ -119,17 +135,18 @@
 </head>
 
 <body>
-    {% for message in messages %}
-        <div class="container-fluid p-4">
-            <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" >
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        </div>
-    {% endfor %}
+    
     <section>
         <div class="left-half">
-            <article style='top: 42%'>			
+            <article style='top: 42%'>	
+                {% for message in messages %}
+                <div class="alert_display">
+                    <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert" >
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+            {% endfor %}		
                 <img class="logo" src={% static "media/img/logo.jpg"%} alt="Logo">
                 <p>by Codebusters</p>
             </article>
@@ -140,7 +157,6 @@
         
         <div class="right-half">	
             
-
             <form action="/login_user" method="POST">
                 {% csrf_token %}
                 <div>
