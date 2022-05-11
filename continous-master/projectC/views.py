@@ -248,20 +248,21 @@ def attendance(request, course_id):
                     attendance.date = date
                     attendance.status= mark
                     attendance.save()
-
-                if mark == 'Absent':
-                    student.absent = student.absent + 1
-                if mark == 'Present':
-                    student.present = student.present + 1
-                student.save()
-                context = {
-                    'students': student,
-                    'course': course_id,
-                }
-                messages.success(request,'Attendance submited')
-                return redirect ('/view_course/'+str(course_id.id))
-
-                #return redirect ('/take_attendance/'+ str(course_id.id)+'/'+ str(date))
+                try:
+                    if mark == 'Absent':
+                        student.absent = student.absent + 1
+                    if mark == 'Present':
+                        student.present = student.present + 1
+                    student.save()
+                    context = {
+                        'students': student,
+                        'course': course_id,
+                    }
+                    messages.success(request,'Attendance submited')
+                    return redirect ('/view_course/'+str(course_id.id))
+                except Exception as e:
+                    messages.error(request, 'Please mark all students')
+                return redirect ('/attendance/'+ str(course_id.id))
             else:
                 messages.error(request,'An error occured try again')
                 return redirect ('/attendance/'+ str(course_id.id))
